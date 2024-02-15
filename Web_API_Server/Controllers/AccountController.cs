@@ -17,7 +17,7 @@ namespace Controllers
         [HttpPost("login")]             // 라우팅 경로에 추가 되는 부분
         public async Task<IActionResult> Login(LoginRequest loginRequest)
         {
-            using (MySqlConnection connection = await Database.GetMySqlConnetion())
+            using (MySqlConnection connection = await Database.GetMySqlConnetion())     // 데이터베이스 연결
             {
                 Console.WriteLine("asd");
                 // 데이터베이스에서 해당 로그인 아이디의 사용자 정보를 가져옴
