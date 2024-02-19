@@ -40,6 +40,26 @@ class Room_IDPacket : BasePacket
     }
 };
 
+class RoomManager
+{
+    // 클라이언트 소켓을 보관할 리스트 생성
+    public static List<List<Socket>> roomList = new List<List<Socket>>();
+    public int roomCount = 10;
+
+    public RoomManager()
+    {
+        for(int i = 0; i < roomCount; i++)
+        {
+            roomList[i] = new List<Socket>();
+        }
+
+    }
+
+    public void AddSocket(Socket socket, int roomIndex)
+    {
+        roomList[roomIndex].Add(socket); // 리스트에 소켓을 담는다. 
+    }
+}
 
 // 클라이언트 소켓을 다루는 클래스
 class ClientHandler
@@ -48,11 +68,9 @@ class ClientHandler
     Socket socket = null; // AcceptSocket()하면 생성자로 소켓을 던져준다. 이때 그 소켓을 받아낼 변수
     int roomIndex;
 
-    public ClientHandler(Socket socket, int roomIndex)
+    public ClientHandler(Socket socket)
     {
         this.socket = socket; // this.socket == 10번 라인 socket
-        this.roomIndex = roomIndex;
-        ChatServer.roomList[roomIndex].Add(socket); // 리스트에 소켓을 담는다.
     }
 
     // 클라이언트 소켓을 처리하는 메소드
@@ -74,7 +92,7 @@ class ClientHandler
 
                 // 배열리스트에 보관된 모든 클라이언트 처리 소켓만큼
                 // 현재 접속한 모든 클라이언트에게 글을 쓴다.
-                foreach (Socket s in ChatServer.roomList[roomIndex])
+                foreach (Socket s in RoomManager.roomList[roomIndex])
                 {
                     stream = new NetworkStream(s);
                     stream.Write(responseData, 0, responseData.Length);
@@ -87,7 +105,7 @@ class ClientHandler
         }
         finally
         {
-            ChatServer.roomList[roomIndex].Remove(socket);
+            RoomManager.roomList[roomIndex].Remove(socket);
             socket.Close();
             socket = null;
         }
@@ -98,10 +116,11 @@ class ClientHandler
 
 class PacketHandler
 {
+    public static Dictionary<ushort, BasePacket> packet_list;
 
-    public void AddPacket()
+    public void AddPacket(ushort packetID, BasePacket packet)   // 오류) 개체 참조가 개체의 인스턴스로 설정되지 않았습니다.
     {
-
+        packet_list.Add(packetID, packet);
     }
 
     public void ReadPacket()
@@ -112,16 +131,18 @@ class PacketHandler
 
 class ChatServer
 {
-    // 클라이언트 소켓을 보관할 리스트 생성
-    public static List<List<Socket>> roomList = new List<List<Socket>>();
+    
 
-    public static List<Socket> room01 = new List<Socket>();
-    public static List<Socket> room02 = new List<Socket>();
-    public static List<Socket> room03 = new List<Socket>();
-
+    
 
     public static void Main()
     {
+        // 사용할 패킷들 정보 Init
+        //PacketHandler pHandler = new PacketHandler();
+        //Room_IDPacket roomIDPacket = new Room_IDPacket();
+        //pHandler.AddPacket(roomIDPacket.packet_id, roomIDPacket);
+        //pHandler.AddPacket(userPacket.packet_id, userPacket);  // 추후 userPacket 추가예정
+
         TcpListener tcpListener = null;
         Socket clientsocket = null;
         try
@@ -138,9 +159,7 @@ class ChatServer
                 clientsocket = tcpListener.AcceptSocket(); // 서버 대기
                 Console.WriteLine("Connection accepted.");
 
-                PacketHandler pHandler = new PacketHandler();
-                pHandler.
-
+                /*
                 // 패킷 처리
                 switch()
                 {
@@ -160,12 +179,14 @@ class ChatServer
                         Thread t = new Thread(new ThreadStart(cHandler.chat));
                         t.Start();
                         break;
-                }
+                }*/
 
                 // 클라이언트 소켓을 쓰레드에 싣는 부분
-                //ClientHandler cHandler = new ClientHandler(clientsocket, 0);
-                //Thread t = new Thread(new ThreadStart(cHandler.chat));
-                //t.Start();
+                RoomManager roomManager = new RoomManager();
+                roomManager.AddSocket(clientsocket, 0);
+                ClientHandler cHandler = new ClientHandler(clientsocket);
+                Thread t = new Thread(new ThreadStart(cHandler.chat));
+                t.Start();
             }
         }
         catch (Exception e)
