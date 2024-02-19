@@ -17,7 +17,7 @@ namespace Controllers
         [HttpPost("login")]             // 라우팅 경로에 추가 되는 부분
         public async Task<IActionResult> Login(LoginRequest loginRequest)
         {
-            using (MySqlConnection connection = await Database.GetMySqlConnetion())     // 데이터베이스 연결
+            using (MySqlConnection connection = await Database.GetMySqlConnetion())
             {
                 Console.WriteLine("asd");
                 // 데이터베이스에서 해당 로그인 아이디의 사용자 정보를 가져옴
@@ -31,16 +31,30 @@ namespace Controllers
                 }
 
                 // 로그인 성공 시 세션에 사용자 ID를 저장
-                HttpContext.Session.SetString("UserId", userInfo.Id.ToString());
+                if (string.IsNullOrEmpty(HttpContext.Session.GetString(loginRequest.LoginId)))
+                {
+                    HttpContext.Session.SetString(loginRequest.LoginId, userInfo.Id.ToString());
+                }
+
+                Console.WriteLine($"Session Key: UserId, Value: {HttpContext.Session.GetString(loginRequest.LoginId)}");
+
+
+                // 로그인 성공 시 세션에 사용자 ID를 저장
+                /*HttpContext.Session.SetString("UserId", userInfo.Id.ToString());
+                Console.WriteLine($"Session Key: UserId, Value: {HttpContext.Session.GetString("UserId")}");
+*/
                 return Ok("Login successful");
             }
         }
-
+        //"f36d93b1-b1b2-bd17-6231-06d3248ae417"
         [HttpGet("logout")]
         public IActionResult Logout()
         {
             // 세션에서 사용자 ID를 제거하여 로그아웃
             HttpContext.Session.Remove("UserId");
+
+
+            Console.WriteLine($"Session Key: UserId, Value: {HttpContext.Session.GetString("UserId")}");
             return Ok("Logout successful");
         }
 
