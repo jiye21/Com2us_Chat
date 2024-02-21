@@ -23,6 +23,13 @@ public class LobbyManager_TCP : MonoBehaviour
 
     Queue<string> msgQueue;
 
+    string roomName;
+
+    [SerializeField]
+    TMP_InputField roomText;
+
+    [SerializeField]
+    GameObject createRoomCanvas;
 
     void Start()
     {
@@ -30,8 +37,8 @@ public class LobbyManager_TCP : MonoBehaviour
 
         ConnectTCP();
 
-        // 나중에 방 목록 업데이트 되면 또 버튼 리스너 달아줘야 함
-        SetEnterBtn();
+        // 나중에 방 목록 업데이트 되면 버튼 번호도 달라져야 함. 추후 함수 재호출 필요.
+        SetBtn();
     }
 
 
@@ -98,21 +105,10 @@ public class LobbyManager_TCP : MonoBehaviour
     }
 
 
-    public void EnterBtn(int btnNum)
+    public void SetBtn()
     {
-        Debug.Log("btnNum: "+btnNum);
-        if (tcpClient == null || !tcpClient.Connected) return;
-
-        //  서버에 전송하기 (GetStream().Write)
-        var data = Encoding.UTF8.GetBytes("/join " + btnNum.ToString());
-        tcpClient.GetStream().Write(data);
-
-    }
-
-
-    // 버튼에 onClick 리스너 등록, 방 번호는 0번부터 차례로 시작 
-    public void SetEnterBtn()
-    {
+        // 방 입장 버튼 init
+        // 버튼에 onClick 리스너 등록, 방 번호는 0번부터 차례로 시작 
         int cnt = content.transform.childCount;
         for(int i = 0; i < cnt; i++)
         {
@@ -122,9 +118,52 @@ public class LobbyManager_TCP : MonoBehaviour
             {
                 EnterBtn(index);
             });
-
         }
 
+    }
+
+
+    // 방 입장 버튼 리스너
+    public void EnterBtn(int btnNum)
+    {
+        Debug.Log("btnNum: " + btnNum);
+        if (tcpClient == null || !tcpClient.Connected) return;
+
+        //  서버에 전송하기 (GetStream().Write)
+        var data = Encoding.UTF8.GetBytes("/join " + btnNum.ToString());
+        tcpClient.GetStream().Write(data);
+
+    }
+
+    // 로비의 방 생성 버튼, 방제목 입력 Canvas 띄워줌. 수동으로 달아줌. 
+    public void CreateBtnInLobby()
+    {
+        createRoomCanvas.SetActive(true);
+
+
+    }
+
+    // 방 생성 버튼, 수동으로 달아줌. 
+    public void CreateBtn()
+    {
+        if (tcpClient == null || !tcpClient.Connected) return;
+
+
+        //  서버에 전송하기 (GetStream().Write)
+        roomName = roomText.text;
+        Debug.Log("btn: create" + roomName);
+
+        var data = Encoding.UTF8.GetBytes("/create " + roomName);
+        tcpClient.GetStream().Write(data);
+
+        // Canvas 닫음
+        createRoomCanvas.SetActive(false);
+    }
+
+    // Canvas 닫는 버튼, 수동으로 달아줌. 
+    public void CloseBtn()
+    {
+        createRoomCanvas.SetActive(false);
     }
 
 
