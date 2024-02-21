@@ -8,6 +8,8 @@ using System.Text;
 using System.IO;
 using System.Threading;
 using System;
+using System.Threading.Tasks;
+
 
 public class ChatManager_TCP : MonoBehaviour
 {
@@ -27,12 +29,14 @@ public class ChatManager_TCP : MonoBehaviour
     [SerializeField]
     GameObject msgPrefab;
 
+    
     TcpClient tcpClient;
+    
     Queue<string> msgQueue;
 
 
 
-    void Start()
+    public void Start()
     {
         //  메시지 큐
         msgQueue = new Queue<string>();
@@ -48,7 +52,9 @@ public class ChatManager_TCP : MonoBehaviour
             var msg = msgQueue.Dequeue();
 
             //  문자열 자르기
-            var textList = msg.Split(" : ");
+            var textList = msg.Split(":");
+
+            Debug.Log(msg);
 
             // 오브젝트 생성
             var newtextobj = Instantiate(msgPrefab, Vector3.zero, Quaternion.identity);
@@ -73,6 +79,9 @@ public class ChatManager_TCP : MonoBehaviour
        
     }
 
+
+
+    
     // TCP 연결 시도가 성공적으로 완료되었을 때 실행됨
     private void requestCall(System.IAsyncResult ar)
     {
@@ -82,7 +91,7 @@ public class ChatManager_TCP : MonoBehaviour
         // 데이터를 읽은 후에는 requestCallTCP 함수를 호출하여 데이터를 처리
         tcpClient.GetStream().BeginRead(buf, 0, buf.Length, requestCallTCP, buf);
     }
-
+        
     // 수신된 데이터가 처리되는 함수
     private void requestCallTCP(System.IAsyncResult ar)
     {
@@ -110,6 +119,8 @@ public class ChatManager_TCP : MonoBehaviour
             Debug.LogException(e);
         }
     }
+    
+
 
     // MsgInputfield에 이벤트 등록 되어있음
     public void InputEnter()
@@ -117,16 +128,13 @@ public class ChatManager_TCP : MonoBehaviour
         //  이름이나 내용이 없으면 안보냄
         if (uiID.text.Length == 0 || uiMsg.text.Length == 0)
             return;
-    
+        if (tcpClient == null || !tcpClient.Connected)
+            return;
+
 
         //  서버에 전송하기 (GetStream().Write)
-        var data = Encoding.UTF8.GetBytes(uiID.text + " : " + uiMsg.text + "\0");
-
-        if (tcpClient != null && tcpClient.Connected)
-        {
-            tcpClient.GetStream().Write(data);
-
-        }
+        var data = Encoding.UTF8.GetBytes(uiID.text + ":" + uiMsg.text + "\0");
+        tcpClient.GetStream().Write(data);
 
         //  문자열 초기화
         uiMsg.text = "";
@@ -136,7 +144,8 @@ public class ChatManager_TCP : MonoBehaviour
         uiMsg.ActivateInputField();
     }
     
-
+    
+    
     public void ConnectTCP()
     {
         if (tcpClient != null)
@@ -145,12 +154,12 @@ public class ChatManager_TCP : MonoBehaviour
         tcpClient = new TcpClient();
         tcpClient.BeginConnect(ipAddr, port, requestCall, null);
     }
-
-
+    
+    
     private void OnDestroy()
     {
         if (tcpClient != null)
             tcpClient.Close();
     }
-
+    
 }

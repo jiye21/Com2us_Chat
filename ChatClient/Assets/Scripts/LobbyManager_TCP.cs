@@ -1,146 +1,81 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
+using System.Text;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LobbyManager_TCP : MonoBehaviour
 {
-    enum PACKET_TYPE
-    {
-        LOGIN,
-        CHAT,
-        ROOM_ID,
-        GET_ID,
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    class BasePacket
-    {
-        public ushort packet_len;
-        public ushort packet_id;
-    };
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    class Room_IDPacket : BasePacket
-    {
-        public int roomID;
-
-        public Room_IDPacket()
-        {
-            roomID = 0;
-            packet_id = (ushort)PACKET_TYPE.ROOM_ID;
-            packet_len = (ushort)Marshal.SizeOf(typeof(Room_IDPacket));
-        }
-    };
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    class Get_IDPacket : BasePacket
-    {
-        public int id;
-
-        public Get_IDPacket()
-        {
-            id = 0;
-            packet_id = (ushort)PACKET_TYPE.GET_ID;
-            packet_len = (ushort)Marshal.SizeOf(typeof(Get_IDPacket));
-        }
-    };
-
+    //private static LobbyManager_TCP instance;
 
     [SerializeField]
     string ipAddr = "127.0.0.1";
     [SerializeField]
     int port = 9999;
-    //[SerializeField]
-    //GameObject playerObj;
 
-    //Dictionary<int, GameObject> playerList = new Dictionary<int, GameObject>();
 
     TcpClient tcpClient;
 
+    [SerializeField]
+    GameObject content;
+
     Queue<string> msgQueue;
-    Queue<BasePacket> Queue;
 
-    private void Start()
+
+    void Start()
     {
-        Debug.Log(Marshal.SizeOf(typeof(Room_IDPacket)));
+        // singleton
+        //if (instance != null) DestroyImmediate(gameObject);
 
+        //instance = this;
+        //DontDestroyOnLoad(gameObject);
 
-        //  메시지 큐
         msgQueue = new Queue<string>();
-        Queue = new Queue<BasePacket>();
 
         ConnectTCP();
+
+        // 나중에 방 목록 업데이트 되면 또 버튼 리스너 달아줘야 함
+        SetEnterBtn();
     }
 
-    //float tick = 0;
-    //int myId = 0;
 
-    private void Update()
+    void Update()
     {
+        // SceneManager.LoadScene 작업은 메인 스레드에서만 해야 해서 들어온 데이터를 큐에 담아 메인 스레드에서 처리
         if (msgQueue.Count > 0)
         {
             var msg = msgQueue.Dequeue();
-        }
 
-        if (Queue.Count > 0)
-        {
-            var basePack = Queue.Dequeue();
+            //  문자열 자르기
+            var textList = msg.Split(" : ");
 
-            switch ((PACKET_TYPE)basePack.packet_id)
+            if (textList[0] == "200")
             {
-                case PACKET_TYPE.ROOM_ID:
-                    {
-                        //var pack = (Room_IDPacket)basePack;
-                        //playerObj.name = "player" + pack.roomID;
-                        //myId = pack.id;
-
-                        //playerList.Add(pack.id, playerObj);
-                    }
-                    break;
-                                
+                SceneManager.LoadScene("ChatScene");
             }
+
         }
 
-        {
-            Room_IDPacket packet = new Room_IDPacket();
-            packet.roomID = 0;
-
-            SendCall(packet);
-        }
-
-        //tick -= Time.deltaTime;
-        /*
-        if (tick <= 0)
-        {
-            PosPacket packet = new PosPacket();
-            packet.id = myId;
-            packet.pos = playerObj.transform.position;
-            packet.rot = playerObj.transform.rotation;
-
-            SendCall(packet);
-
-            tick = 0.1f;
-        }*/
     }
+
     /// <summary>
-    /// ////////////////////////////////////////////////////////////
+    /// TCP client callback. TCP 연결 시도가 성공적으로 완료되었을 때 실행됨
     /// </summary>
-    private void requestCall(System.IAsyncResult ar)
+    /// <param name="ar"></param>
+    private void StartReadingTCP(System.IAsyncResult ar)
     {
-        tcpClient.EndConnect(ar);
-
-        SendCall(new Room_IDPacket());
-
         byte[] buf = new byte[512];
-        tcpClient.GetStream().BeginRead(buf, 0, buf.Length, requestCallTCP, buf);
+
+        // TCP 클라이언트의 네트워크 스트림에서 비동기적으로 데이터를 읽고,
+        // 데이터를 읽은 후에는 OnTCPDataReceived 함수를 호출하여 데이터를 처리
+        tcpClient.GetStream().BeginRead(buf, 0, buf.Length, OnTCPDataReceived, buf);
     }
 
-    Queue<byte> streamBuffer = new Queue<byte>();
-
-    private void requestCallTCP(System.IAsyncResult ar)
+    // 수신된 데이터가 처리되는 함수
+    private void OnTCPDataReceived(System.IAsyncResult ar)
     {
         try
         {
@@ -149,41 +84,11 @@ public class LobbyManager_TCP : MonoBehaviour
             if (byteRead > 0)
             {
                 byte[] data = (byte[])ar.AsyncState;
+                string msg = Encoding.UTF8.GetString(data);
 
-                //  버퍼에 추가
-                for (int i = 0; i < byteRead; i++)
-                {
-                    streamBuffer.Enqueue(data[i]);
-                }
+                msgQueue.Enqueue(Encoding.UTF8.GetString(data));
 
-                //  버퍼가 베이스보다 커지면
-                if (streamBuffer.Count > Marshal.SizeOf(typeof(BasePacket)))
-                {
-                    //  베이스로 변환해봄( 픽 )
-                    var basePack = ByteToObject<BasePacket>(streamBuffer.ToArray());
-                    //var basePack2 = ByteToObject<BasePacket>(data);
-
-                    //  버퍼크기가 패킷만큼 왔으면~
-                    if (streamBuffer.Count >= basePack.packet_len)
-                    {
-                        switch ((PACKET_TYPE)basePack.packet_id)
-                        {
-                            case PACKET_TYPE.ROOM_ID:
-                                var pack = ByteToObject<Room_IDPacket>(data);
-                                Queue.Enqueue(pack);
-                                break;
-
-                        }
-
-                        //  사용한 패킷 제거
-                        for (int i = 0; i < basePack.packet_len; i++)
-                        {
-                            streamBuffer.Dequeue();
-                        }
-                    }
-                }
-
-                tcpClient.GetStream().BeginRead(data, 0, data.Length, requestCallTCP, data);
+                tcpClient.GetStream().BeginRead(data, 0, data.Length, OnTCPDataReceived, data);
             }
             else
             {
@@ -199,71 +104,54 @@ public class LobbyManager_TCP : MonoBehaviour
     }
 
 
+    public void EnterBtn(int btnNum)
+    {
+        Debug.Log("btnNum: "+btnNum);
+        if (tcpClient == null || !tcpClient.Connected) return;
+
+        //  서버에 전송하기 (GetStream().Write)
+        var data = Encoding.UTF8.GetBytes("/join " + btnNum.ToString());
+        tcpClient.GetStream().Write(data);
+
+    }
+
+
+    // 버튼에 onClick 리스너 등록, 방 번호는 0번부터 차례로 시작 
+    public void SetEnterBtn()
+    {
+        int cnt = content.transform.childCount;
+        for(int i = 0; i < cnt; i++)
+        {
+            Transform btn = content.transform.GetChild(i);
+            int index = i;
+            btn.GetComponentInChildren<Button>().onClick.AddListener(() => 
+            {
+                EnterBtn(index);
+            });
+
+        }
+
+    }
+
+
     public void ConnectTCP()
     {
         if (tcpClient != null)
             return;
 
         tcpClient = new TcpClient();
-        tcpClient.BeginConnect(ipAddr, port, requestCall, null);
-    }
-    public void SendCall(byte[] _data)
-    {
-        tcpClient.GetStream().Write(_data);
-    }
-    public void SendCall<T>(T _obj)
-    {
-        if (tcpClient.Connected)
-            tcpClient.GetStream().Write(ObjectToByte(_obj));
+        tcpClient.BeginConnect(ipAddr, port, StartReadingTCP, null);
     }
 
-    void OnDestroy()
+
+    private void OnDestroy()
     {
         if (tcpClient != null)
         {
             tcpClient.GetStream().Close();
             tcpClient.Close();
+            tcpClient = null;
         }
-
     }
-
-
-    public static T ByteToObject<T>(byte[] buffer)
-    {
-        T structure;
-
-        int size = Marshal.SizeOf(typeof(T));
-
-        IntPtr ptr = Marshal.AllocHGlobal(size);
-        try
-        {
-            Marshal.Copy(buffer, 0, ptr, size);
-            structure = Marshal.PtrToStructure<T>(ptr);
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(ptr);
-        }
-
-        return structure;
-    }
-
-    public static byte[] ObjectToByte<T>(T structure)
-    {
-        int size = Marshal.SizeOf(structure);
-        byte[] byteArray = new byte[size];
-
-        IntPtr ptr = Marshal.AllocHGlobal(size);
-        try
-        {
-            Marshal.StructureToPtr(structure, ptr, false);
-            Marshal.Copy(ptr, byteArray, 0, size);
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(ptr);
-        }
-
-        return byteArray;
-    }
+    
 }
