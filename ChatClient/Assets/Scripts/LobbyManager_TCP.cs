@@ -9,7 +9,6 @@ using UnityEngine.UI;
 
 public class LobbyManager_TCP : MonoBehaviour
 {
-    //private static LobbyManager_TCP instance;
 
     [SerializeField]
     string ipAddr = "127.0.0.1";
@@ -27,12 +26,6 @@ public class LobbyManager_TCP : MonoBehaviour
 
     void Start()
     {
-        // singleton
-        //if (instance != null) DestroyImmediate(gameObject);
-
-        //instance = this;
-        //DontDestroyOnLoad(gameObject);
-
         msgQueue = new Queue<string>();
 
         ConnectTCP();
@@ -54,6 +47,7 @@ public class LobbyManager_TCP : MonoBehaviour
 
             if (textList[0] == "200")
             {
+                GameObject.Find("RoomNumManager").GetComponent<RoomNumManager>().myRoomNum = textList[1];
                 SceneManager.LoadScene("ChatScene");
             }
 
