@@ -110,17 +110,31 @@ public class ChatServer
                         stream.Flush();
                     }
                 }
+                else if (message.StartsWith("/create"))
+                {
+                    string[] parts = message.Split(' ');
+                    if (parts.Length == 2)
+                    {
+                        string roomName = parts[1];
+                        GetOrCreateRoom(roomName);
+
+                        var responseData = Encoding.ASCII.GetBytes("200 : " + roomName);
+                        stream.Write(responseData, 0, responseData.Length);
+                        stream.Flush();
+                    }
+                    else
+                    {
+                        //SendMessage("Invalid /create command. Usage: /create [room_name]", clientSocket);
+                    }
+                }
+
                 else
                 {
                     // 로비에서 접속을 끊고 채팅방으로 이동(새로운 접속) 후의 상황. 
-                    // 클라이언트에서 몇번 방인지 같이 보내준다. 
-                    // ex. "0)id:msg"
-                    string[] parts = message.Split(')');
-                    // parts[0] = 방번호
-                    // parts[1] = 메세지 내용
-                    Console.WriteLine(parts[0]);
-                    Console.WriteLine(parts[1]);
+                    // 클라이언트에서 몇번 방인지 같이 보내준다. ex. "0)id:msg"
 
+                    // parts[0] = 방번호, parts[1] = 메세지 내용
+                    string[] parts = message.Split(')');
                     if (parts.Length == 2)
                     {
                         string roomName = parts[0];
@@ -148,9 +162,6 @@ public class ChatServer
                             }
                         }
                     }
-
-
-                    
                 }
             }
         }
