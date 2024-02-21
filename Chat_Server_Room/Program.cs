@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -33,6 +34,12 @@ public class ChatRoom
 
     public void AddClient(TcpClient client)
     {
+        // 이미 client가 list에 담겨 있는 상태라면 바로 함수를 종료한다. 
+        foreach(TcpClient c in clients)
+        {
+            if (c == client) return;
+        }
+
         clients.Add(client);
     }
 
@@ -75,7 +82,7 @@ public class ChatServer
         byte[] buffer = new byte[1024];
         int bytesRead;
 
-        string myRoomNum = "-1";
+        ChatRoom room = null;
 
         try
         {
@@ -93,42 +100,56 @@ public class ChatServer
                     {
                         string roomName = parts[1];
                         // roomName으로 방 생성 후 방 list에 저장
-                        ChatRoom room = GetOrCreateRoom(roomName);
-                        // 방에 client 추가
-                        room.AddClient(client);
-                                                
-
-                        // 내 방번호 저장
-                        myRoomNum = roomName;
+                        room = GetOrCreateRoom(roomName);
 
                         Console.WriteLine("Client joined room: " + roomName);
 
-                        string data = "200 : ok";
-
-                        var responseData = Encoding.ASCII.GetBytes(data);
+                        // 응답코드와 방번호 전송, 200 = ok.
+                        var responseData = Encoding.ASCII.GetBytes("200 : " + roomName);
                         stream.Write(responseData, 0, responseData.Length);
                         stream.Flush();
                     }
                 }
                 else
                 {
-                    // 현재 0번 방에게 broadcast 중
-                    string[] parts = message.Split(':');
+                    // 로비에서 접속을 끊고 채팅방으로 이동(새로운 접속) 후의 상황. 
+                    // 클라이언트에서 몇번 방인지 같이 보내준다. 
+                    // ex. "0)id:msg"
+                    string[] parts = message.Split(')');
+                    // parts[0] = 방번호
+                    // parts[1] = 메세지 내용
+                    Console.WriteLine(parts[0]);
+                    Console.WriteLine(parts[1]);
+
                     if (parts.Length == 2)
                     {
-                        //rooms[0].BroadcastMessage(message, client);
-                    }
+                        string roomName = parts[0];
+                        string responseData = parts[1];
 
-                    
-                    // Broadcast message to client's room
-                    foreach (ChatRoom room in rooms)
-                    {
-                        if (room.Name == myRoomNum)
+                        // 최초 접속시에만 실행
+                        if (parts[1] == "new client connected")
                         {
-                            room.BroadcastMessage(message, client);
-                            break;
+                            // roomName으로 방정보 Get
+                            room = GetOrCreateRoom(roomName);
+                            // 방에 client 추가, 만약 이미 client가 방에 추가되어 있으면 추가하지 않고 함수 종료. 
+                            room.AddClient(client);
+
+                            responseData = " " + ":" + responseData;
+                        }
+
+
+                        // Broadcast message to client's room
+                        foreach (ChatRoom r in rooms)
+                        {
+                            if (r.Name == roomName)
+                            {
+                                r.BroadcastMessage(responseData, client);
+                                break;
+                            }
                         }
                     }
+
+
                     
                 }
             }
@@ -139,6 +160,8 @@ public class ChatServer
         }
         finally
         {
+            // client와 연결이 종료될 때 방 목록에서도 삭제해준다. 
+            if(room != null) room.RemoveClient(client);
             client.Close();
         }
     }

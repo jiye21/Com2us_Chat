@@ -78,7 +78,7 @@ namespace Controllers
                 if (existingUser != null)
                 {
                     return BadRequest($"User with the same login ID already exists {StatusCode((int)EErrorCode.LogoutFail)}");
-                    return StatusCode((int)EErrorCode.LogoutFail);
+                    //return StatusCode((int)EErrorCode.LogoutFail);
                 } 
 
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);               // 입력한 비밀번호를 해쉬화해서 저장
