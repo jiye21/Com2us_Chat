@@ -7,12 +7,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class RoomNumManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    private static RoomNumManager instance;
+    private static GameManager instance;
 
     // LobbyManager로부터 내가 접속할 방 번호 받아옴
     public string myRoomNum;
+
+    public string sessionKey;
 
     void Start()
     {
@@ -26,6 +28,6 @@ public class RoomNumManager : MonoBehaviour
 
     void Update()
     {
-        
+
     }
 }

@@ -31,14 +31,20 @@ public class LobbyManager_TCP : MonoBehaviour
     [SerializeField]
     GameObject createRoomCanvas;
 
+    [SerializeField]
+    GameObject roomPrefab;
+
+    [SerializeField]
+    ScrollRect uiView;
+
     void Start()
     {
         msgQueue = new Queue<string>();
 
         ConnectTCP();
 
-        // 나중에 방 목록 업데이트 되면 버튼 번호도 달라져야 함. 추후 함수 재호출 필요.
-        SetBtn();
+        // 방 목록 가져오는 코루틴 시작. 3초마다 갱신함. 
+        StartCoroutine("GetRoomList");
     }
 
 
@@ -52,14 +58,107 @@ public class LobbyManager_TCP : MonoBehaviour
             //  문자열 자르기
             var textList = msg.Split(" : ");
 
+
             if (textList[0] == "200")
             {
-                GameObject.Find("RoomNumManager").GetComponent<RoomNumManager>().myRoomNum = textList[1];
+                GameObject.Find("GameManager").GetComponent<GameManager>().myRoomNum = textList[1];
                 SceneManager.LoadScene("ChatScene");
+            }
+
+            // 방 목록이 들어오면
+            if (textList[0] == "Available_rooms")
+            {
+                var roomInfo = textList[1].Split("and");
+
+                var roomList = roomInfo[0].Split(", ");
+                var userCount = roomInfo[1].Split(", ");
+
+                Debug.Log(roomInfo[0]);
+                Debug.Log(roomInfo[1]);
+                Debug.Log(roomList[0]);
+                Debug.Log(userCount[2]);
+
+
+                SetRoomList(roomList, userCount);
+            }
+        }
+
+    }
+
+    IEnumerator GetRoomList()
+    {
+        while(true)
+        {
+            if (tcpClient == null || !tcpClient.Connected) continue;
+
+            var data = Encoding.UTF8.GetBytes("/list");
+            tcpClient.GetStream().Write(data);
+
+            yield return new WaitForSecondsRealtime(3.0f);
+        }
+    }
+
+
+    int flag = 0;
+
+    void SetRoomList(string[] roomList, string[] userCount)
+    {
+        int cnt = content.transform.childCount;
+
+        // 현재 내 방제목이 서버에서 보내준 방제목과 같을 때 인원수만 갱신. 
+        for (int i = 0 ;  i < cnt; i++)
+        {
+            Transform roomObj = content.transform.GetChild(i);
+
+            TMP_Text[] texts = roomObj.GetComponentsInChildren<TMP_Text>();
+
+            // 텍스트 넣기
+            for(int j = 0; j<roomList.Length; j++)
+            {
+                if(texts[0].text == roomList[j])
+                {
+                    texts[1].text = userCount[j] + "/10";
+
+                    // 반영한 유저수는 삭제하기 위해 -1 대입. 
+                    userCount[j] = "-1";
+                }
+            }
+        }
+
+        // 새로운 방이 생겼다면(데이터가 반영이 안됨) 방 prefab을 새로 만들어준다. 
+        // 새로 방 prefab을 추가해 데이터를 적용해준다. 
+        for (int j = 0; j < roomList.Length; j++)
+        {
+            if (userCount[j] != "-1")
+            {
+                var newRoomList = Instantiate(roomPrefab, Vector3.zero, Quaternion.identity);
+
+                TMP_Text[] texts = newRoomList.GetComponentsInChildren<TMP_Text>();
+
+                texts[0].text = roomList[j];
+                texts[1].text = userCount[j] + "/10";
+
+                // 뷰박스에 넣고 정보 갱신
+                newRoomList.transform.SetParent(uiView.content, false);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(uiView.content);
+
+                //  스크롤 갱신
+                var view = uiView.transform as RectTransform;
+                if (view.rect.height < uiView.content.rect.height)
+                {
+                    uiView.content.anchoredPosition = new Vector2(0, uiView.content.rect.height);
+                }
             }
 
         }
 
+        if(flag == 0)
+        {
+            SetBtn();
+            flag++;
+        }
+
+        //SetBtn();
     }
 
     /// <summary>
@@ -185,6 +284,9 @@ public class LobbyManager_TCP : MonoBehaviour
             tcpClient.Close();
             tcpClient = null;
         }
+
+        // 방목록을 받아오고 세팅하는 코루틴들 종료
+        StopAllCoroutines();
     }
     
 }
