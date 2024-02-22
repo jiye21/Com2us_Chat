@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class LoginManager_HTTP : MonoBehaviour
 {
@@ -79,6 +80,10 @@ public class LoginManager_HTTP : MonoBehaviour
             // downloadHandler는 UnityWebRequest의 속성 중 하나로, HTTP 응답 데이터를 처리한다.
             // .text는 HTTP 응답의 본문을 텍스트 형식으로 가져온다. 
             Debug.Log("서버 응답: " + request.downloadHandler.text);
+
+            // 로그인 성공시 로비로 이동, 추후 세션 체크 조건식 필요
+            SceneManager.LoadScene("LobbyScene");
+
             yield break;
         }
     }
@@ -120,6 +125,12 @@ public class LoginManager_HTTP : MonoBehaviour
             // downloadHandler는 UnityWebRequest의 속성 중 하나로, HTTP 응답 데이터를 처리한다.
             // .text는 HTTP 응답의 본문을 텍스트 형식으로 가져온다. 
             Debug.Log("서버 응답: " + request.downloadHandler.text);
+
+            // 추후 회원가입 성공 또는 실패시 응답할 메세지 조건식 필요. 
+            // 회원가입 후 InputField를 비워준다. 
+            UserName.GetComponent<TMP_InputField>().text = "";
+            Password.GetComponent<TMP_InputField>().text = "";
+
             yield break;
         }
     }
