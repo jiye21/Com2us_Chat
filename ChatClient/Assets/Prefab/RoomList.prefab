@@ -146,7 +146,7 @@ GameObject:
   - component: {fileID: 592191988772020099}
   - component: {fileID: 7476182166657772517}
   m_Layer: 5
-  m_Name: ChatList
+  m_Name: RoomList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -173,7 +173,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1070.853, y: 256}
+  m_SizeDelta: {x: 1070.853, y: 183.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &592191988772020099
 CanvasRenderer:

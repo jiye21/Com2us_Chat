@@ -38,7 +38,7 @@ public class ChatManager_TCP : MonoBehaviour
 
     public void Start()
     {
-        myRoomNum = GameObject.Find("RoomNumManager").GetComponent<RoomNumManager>().myRoomNum;
+        myRoomNum = GameObject.Find("GameManager").GetComponent<GameManager>().myRoomNum;
 
         //  메시지 큐
         msgQueue = new Queue<string>();
@@ -87,7 +87,7 @@ public class ChatManager_TCP : MonoBehaviour
     // TCP 연결 시도가 성공적으로 완료되었을 때 실행됨
     private void requestCall(System.IAsyncResult ar)
     {
-        byte[] buf = new byte[512];
+        byte[] buf = new byte[2048];
 
         // 서버에 내가 몇번방에 입장했는지 한번 보내준다. 
         // 서버는 방 번호 데이터를 일단 받아야 클라이언트를 방에 입장시키는 처리를 하기 때문. 
