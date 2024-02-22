@@ -426,6 +426,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1101640840}
   - component: {fileID: 1101640841}
+  - component: {fileID: 1101640842}
+  - component: {fileID: 1101640843}
   m_Layer: 0
   m_Name: LobbyManager
   m_TagString: Untagged
@@ -467,6 +469,39 @@ MonoBehaviour:
   createRoomCanvas: {fileID: 3610629420785730267}
   roomPrefab: {fileID: 2240403243340014929, guid: 13afe215829425849a3bb4bfee590597, type: 3}
   uiView: {fileID: 7147587711507960437}
+--- !u!114 &1101640842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1101640838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d6eb10fdd9b33c40987828b7576b68f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ipAddr: 127.0.0.1
+  port: 9999
+  content: {fileID: 7147587710248425221}
+  roomText: {fileID: 1580858827903444297}
+  createRoomCanvas: {fileID: 6934087049606545845}
+  roomPrefab: {fileID: 2240403243340014929, guid: b3003dba82621824294df644b1fc52f7, type: 3}
+  uiView: {fileID: 7147587711507960437}
+--- !u!114 &1101640843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1101640838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36a18ceaaed01284c873d692439d3c24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myRoomNum: 
+  sessionKey: 
 --- !u!1 &1505795316
 GameObject:
   m_ObjectHideFlags: 0

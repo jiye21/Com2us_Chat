@@ -518,8 +518,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1236357911}
   m_HandleRect: {fileID: 1236357910}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.9998536
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1283,6 +1283,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1265393340}
   - component: {fileID: 1265393341}
+  - component: {fileID: 1265393342}
   m_Layer: 0
   m_Name: ChatManager
   m_TagString: Untagged
@@ -1323,6 +1324,24 @@ MonoBehaviour:
   uiMsg: {fileID: 331310938}
   uiView: {fileID: 1783191248}
   msgPrefab: {fileID: 4612584296277056198, guid: 6d955395ee5854944bb3c7b61b769cf4, type: 3}
+--- !u!114 &1265393342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265393338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62a1c344a8227a14cb6a4c5d9765f70f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ipAddr: 127.0.0.1
+  port: 9999
+  uiID: {fileID: 818188626}
+  uiMsg: {fileID: 331310938}
+  uiView: {fileID: 1783191248}
+  msgPrefab: {fileID: 4612584296277056198, guid: f5bc7840efc2b1245ae3ecb1f05b9ef4, type: 3}
 --- !u!1 &1305213018
 GameObject:
   m_ObjectHideFlags: 0
@@ -1435,7 +1454,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 919.9994}
+  m_AnchoredPosition: {x: 0, y: 920}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1470398923

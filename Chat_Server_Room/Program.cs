@@ -5,6 +5,32 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using StackExchange.Redis;
+
+// 사용자의 세션 상태 관리 클래스
+public class User : TcpClient
+{
+    public bool isSession; // 세션 상태
+    public TcpClient tcpClient;
+
+    public User()
+    {
+        this.isSession = false;
+    }
+
+    // 사용자의 세션 키 검증 메서드
+    public void CheckSessionInRedis(string redisSessionKey, string clientSessionKey)
+    {
+        if (redisSessionKey == clientSessionKey)
+        {
+            isSession = true;
+        }
+        else
+        {
+            isSession = false;
+        }
+    }
+}
 
 public class ChatRoom
 {
@@ -55,9 +81,27 @@ public class ChatServer
     //public static List<ChatRoom> rooms = new List<ChatRoom>();
     public static Dictionary<string, ChatRoom> rooms = new Dictionary<string, ChatRoom>();
 
+    private ConnectionMultiplexer redis; // redis : 레디스 서버와의 연결을 관리
+    private IDatabase db; // db : ConnectionMultiplexer를 통해 얻은 데이터베이스
+
     public ChatServer(int port)
     {
         listener = new TcpListener(IPAddress.Any, port);
+
+        // Redis 서버에 연결하는 정보 설정
+        ConfigurationOptions options = new ConfigurationOptions
+        {
+            EndPoints = { "127.0.0.1:6379" }, // Redis 서버의 주소 및 포트
+            //Password = "1", // Redis에 암호가 설정되어 있는 경우 암호 설정
+            // 다른 설정도 추가할 수 있음
+        };
+
+        // ConnectionMultiplexer를 통해 Redis에 연결
+        ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(options);
+
+        // 연결된 Redis 인스턴스로부터 IDatabase 인터페이스 얻기
+        db = connection.GetDatabase();
+
     }
 
     public void Start()
@@ -103,13 +147,46 @@ public class ChatServer
 
     private void HandleClient(object obj)
     {
-        TcpClient client = (TcpClient)obj;
-        NetworkStream stream = client.GetStream();
+        //TcpClient client = (TcpClient)obj;
+        User client = new User();
+        client.tcpClient = (TcpClient)obj;
+        NetworkStream stream = client.tcpClient.GetStream();
 
         byte[] buffer = new byte[2048];
         int bytesRead;
 
         ChatRoom room = null;
+
+        // 데이터를 최초 한번 읽음
+        bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+        // 클라가 보낸 세션키 저장, 클라가 연결되자마자 보내는 데이터가 세션키라고 가정함. 
+
+        //string clientSessionKey = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+        string clientSessionKey = "568fa0dc-1e39-45eb-bcf7-73d3d3fd98da";
+
+        Console.WriteLine("세션키 잘 받았다~" + clientSessionKey);
+
+        // 세션 키를 레디스에서 가져오기
+        string redisSessionKey = GetSessionKeyFromRedis();
+
+        // 클라이언트의 세션 확인
+        client.CheckSessionInRedis(redisSessionKey, clientSessionKey);
+
+        if (client.isSession)
+        {
+            var responseData = Encoding.UTF8.GetBytes("200 : " + "ok");
+            stream.Write(responseData, 0, responseData.Length);
+            stream.Flush();
+
+            Console.WriteLine("Received session key from client: " + clientSessionKey);
+        }
+        else
+        {
+            Console.WriteLine("세션키가 달라~");
+            client.Close();
+            return;
+        }
 
         try
         {
@@ -221,6 +298,13 @@ public class ChatServer
         }
     }
 
+    // 레디스에서 세션키 가져오기
+    private string GetSessionKeyFromRedis()
+    {
+        string sessionKey = db.StringGet("2d163123-93ad-4ceb-a98e-d022500e3645");
+        return sessionKey;
+    }
+
     private void SendMessage(string message, TcpClient clientSocket)
     {
         byte[] buffer = Encoding.UTF8.GetBytes(message);
@@ -228,7 +312,6 @@ public class ChatServer
         stream.Write(buffer, 0, buffer.Length);
         stream.Flush();
     }
-
 
     private ChatRoom GetOrCreateRoom(string roomName)
     {
@@ -251,7 +334,5 @@ public class ChatServer
         int port = 9999; // Change this to desired port number
         ChatServer server = new ChatServer(port);
         server.Start();
-
-        
     }
 }
