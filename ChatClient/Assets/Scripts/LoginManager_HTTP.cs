@@ -9,7 +9,6 @@ public class LoginManager_HTTP : MonoBehaviour
 {
     public GameObject UserName;
     public GameObject Password;
-
     public string username;
     public string password;
 
@@ -71,7 +70,7 @@ public class LoginManager_HTTP : MonoBehaviour
         // 에러를 확인하고 처리
         if (request.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log(request.error);
+            Debug.Log($"dfdf{request.error}");
         }
         else
         {
