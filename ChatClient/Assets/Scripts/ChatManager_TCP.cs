@@ -34,10 +34,12 @@ public class ChatManager_TCP : MonoBehaviour
     
     Queue<string> msgQueue;
 
-
+    string myRoomNum;
 
     public void Start()
     {
+        myRoomNum = GameObject.Find("GameManager").GetComponent<GameManager>().myRoomNum;
+
         //  메시지 큐
         msgQueue = new Queue<string>();
 
@@ -85,8 +87,13 @@ public class ChatManager_TCP : MonoBehaviour
     // TCP 연결 시도가 성공적으로 완료되었을 때 실행됨
     private void requestCall(System.IAsyncResult ar)
     {
-        byte[] buf = new byte[512];
-        
+        byte[] buf = new byte[2048];
+
+        // 서버에 내가 몇번방에 입장했는지 한번 보내준다. 
+        // 서버는 방 번호 데이터를 일단 받아야 클라이언트를 방에 입장시키는 처리를 하기 때문. 
+        var data = Encoding.UTF8.GetBytes(myRoomNum + ")" + "new client connected");
+        tcpClient.GetStream().Write(data);
+
         // TCP 클라이언트의 네트워크 스트림에서 비동기적으로 데이터를 읽고,
         // 데이터를 읽은 후에는 requestCallTCP 함수를 호출하여 데이터를 처리
         tcpClient.GetStream().BeginRead(buf, 0, buf.Length, requestCallTCP, buf);
@@ -105,6 +112,7 @@ public class ChatManager_TCP : MonoBehaviour
 
                 msgQueue.Enqueue(Encoding.UTF8.GetString(data));
 
+                // 다시 데이터를 읽기 시작. 
                 tcpClient.GetStream().BeginRead(data, 0, data.Length, requestCallTCP, data);
             }
             else
@@ -133,7 +141,7 @@ public class ChatManager_TCP : MonoBehaviour
 
 
         //  서버에 전송하기 (GetStream().Write)
-        var data = Encoding.UTF8.GetBytes(uiID.text + ":" + uiMsg.text + "\0");
+        var data = Encoding.UTF8.GetBytes(myRoomNum + ")" + uiID.text + ":" + uiMsg.text + "\0");
         tcpClient.GetStream().Write(data);
 
         //  문자열 초기화
