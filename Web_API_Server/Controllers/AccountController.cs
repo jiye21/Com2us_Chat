@@ -79,9 +79,17 @@ namespace Controllers
                 //회원가입 유무  existingUser이 null이어야 가능
                 if (existingUser != null)
                 {
+<<<<<<< HEAD
                     return new string[] { "User with the same login ID already exists " };
                     //return BadRequest("User with the same login ID already exists ");
                     //return StatusCode((int)ErrorCode.LogoutFail);
+=======
+
+                    return new string[] { "User with the same login ID already exists " };
+                    //return BadRequest("User with the same login ID already exists ");
+                    //return StatusCode((int)ErrorCode.LogoutFail);
+
+>>>>>>> main
                 } 
 
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);               // 입력한 비밀번호를 해쉬화해서 저장
