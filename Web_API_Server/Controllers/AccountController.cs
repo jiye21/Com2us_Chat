@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;                               // MySQL 데이터 베이스에 연결하고 쿼리를 실행하는데 사용된다.
 using Microsoft.Extensions.Caching.Distributed;     // 분산 캐싱 기능을 제공 
 using BCrypt.Net;                                   // 해쉬 알고리즘을 위함
-
+using System.Collections;
 
 namespace Controllers
 {
@@ -21,7 +21,7 @@ namespace Controllers
 
 
         [HttpPost("logout")]                    // 로그아웃 라우팅 경로
-        public async Task<IActionResult> Logout()
+        public async Task<IEnumerable<string>> Logout()                     // string으로 보내기위함
         {
             // 클라이언트에서 전송한 세션 키를 얻어옴
             string sessionKey = HttpContext.Request.Cookies["sessionId"];   //HttpContext 객체의 Request 속성에 있는 Cookies 컬렉션을 사용하여 sessionId 쿠키의 값을 가져옵니다.
@@ -34,11 +34,13 @@ namespace Controllers
                 // 클라이언트에게 해당 세션 키를 지우도록 쿠키를 전송
                 HttpContext.Response.Cookies.Delete("sessionId");
 
-                return Ok("Logout successful");
+                return new string[] { "Logout successful" };
+                //return Ok("Logout successful");
             }
             else
             {
-                return BadRequest("No session found to logout");
+                return new string[] { "No session found to logout" };
+                //return BadRequest("No session found to logout");
                 //return EErrorCode.LogoutFail;
             }
         }
@@ -66,7 +68,7 @@ namespace Controllers
 
 
         [HttpPost("register")]                  //// 회원가입 라우팅 경로
-        public async Task<IActionResult> Register(RegisterRequest registerRequest)
+        public async Task<IEnumerable<string>> Register(RegisterRequest registerRequest)
         {
             using (MySqlConnection connection = await Database.GetMySqlConnetion())     // DB연결
             {
@@ -77,8 +79,11 @@ namespace Controllers
                 //회원가입 유무  existingUser이 null이어야 가능
                 if (existingUser != null)
                 {
-                    return BadRequest($"User with the same login ID already exists {StatusCode((int)EErrorCode.LogoutFail)}");
-                    //return StatusCode((int)EErrorCode.LogoutFail);
+
+                    return new string[] { "User with the same login ID already exists " };
+                    //return BadRequest("User with the same login ID already exists ");
+                    //return StatusCode((int)ErrorCode.LogoutFail);
+
                 } 
 
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);               // 입력한 비밀번호를 해쉬화해서 저장
@@ -88,14 +93,15 @@ namespace Controllers
                     new { loginId = registerRequest.LoginId, passwordHash = hashedPassword });
 
                 // Redis에 새 사용자 정보 저장
-                await _redisCache.SetStringAsync(registerRequest.LoginId, "registered");
+               // await _redisCache.SetStringAsync(registerRequest.LoginId, "registered");
 
-                return Ok("User registered successfully");
+                return new string[] { "User registered successfully" };
+                //return Ok("User registered successfully");
             }
         }
 
         [HttpPost("login")]             // 라우팅 경로에 추가 되는 부분
-        public async Task<IActionResult> Login(LoginRequest loginRequest)                   // 데이터베이스 쿼리는 I/O 작업이기 때문에 비동기
+        public async Task<IEnumerable<string>> Login(LoginRequest loginRequest)                   // 데이터베이스 쿼리는 I/O 작업이기 때문에 비동기
         {
             using (MySqlConnection connection = await Database.GetMySqlConnetion())         // 데이터 베이스 연결
 
@@ -107,14 +113,15 @@ namespace Controllers
                 // 사용자가 없거나 비밀번호가 일치하지 않으면 로그인 실패
                 if (userInfo == null )
                 {
-                    return Unauthorized("Invalid login credentials");
+                    return new string[] {"no user"};
+                    //return ErrorCode.LoginFailUserNotExist;
                 }
 
                 bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(loginRequest.Password, userInfo.PasswordHash);
-                Console.WriteLine(isPasswordCorrect);
                 if (!isPasswordCorrect)
                 {
-                    return Unauthorized("Invalid login credentials");
+                    return new string[] { "no password" };
+                    //return ErrorCode.LoginFail;
                 }
 
                 string sessionId = Guid.NewGuid().ToString();
@@ -128,10 +135,10 @@ namespace Controllers
                 HttpContext.Response.Cookies.Append("sessionId", sessionId);                // 클라이언트 브라우저에 세션 ID를 쿠키로 전달...
 
                 Console.WriteLine($"Session Key: {loginRequest.LoginId} {sessionId}, Value: {value}");
+                Console.WriteLine($"HttpContext.sessionId : {sessionId}");
 
-                Console.WriteLine($"HttpContext.sessionId : {sessionId}"); 
-
-                return Ok("Login successful");
+                return new string[] { "성공", sessionId };
+                //return (ErrorCode.None);
 
 
             }
