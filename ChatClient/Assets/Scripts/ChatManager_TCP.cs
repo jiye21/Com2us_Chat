@@ -30,20 +30,22 @@ public class ChatManager_TCP : MonoBehaviour
     GameObject msgPrefab;
 
     
-    TcpClient tcpClient;
+    TcpClient tcpClient = null;
     
     Queue<string> msgQueue;
 
-    string myRoomNum;
+    public string myRoomName;
 
     public void Start()
     {
-        myRoomNum = GameObject.Find("GameManager").GetComponent<GameManager>().myRoomNum;
+        myRoomName = GameObject.Find("GameManager").GetComponent<GameManager>().myRoomName;
 
         //  메시지 큐
         msgQueue = new Queue<string>();
 
         ConnectTCP();
+
+        StartCoroutine(SendInitData());
     }
 
 
@@ -53,35 +55,86 @@ public class ChatManager_TCP : MonoBehaviour
         {
             var msg = msgQueue.Dequeue();
 
-            //  문자열 자르기
-            var textList = msg.Split(":");
 
-            Debug.Log(msg);
-
-            // 오브젝트 생성
-            var newtextobj = Instantiate(msgPrefab, Vector3.zero, Quaternion.identity);
-
-            // 텍스트 넣기
-            TMP_Text[] texts = newtextobj.GetComponentsInChildren<TMP_Text>();
-            texts[0].text = textList[0];
-            texts[1].text = textList[1];
-
-            // 뷰박스에 넣고 정보 갱신
-            newtextobj.transform.SetParent(uiView.content, false);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(uiView.content);
-
-            //  스크롤 갱신
-            var view = uiView.transform as RectTransform;
-            if (view.rect.height < uiView.content.rect.height)
+            // 방 입장했다는 메세지 처리
+            if (msg.StartsWith("Joined room: "))
             {
-                uiView.content.anchoredPosition = new Vector2(0, uiView.content.rect.height);
+                // 오브젝트 생성
+                var newtextobj = Instantiate(msgPrefab, Vector3.zero, Quaternion.identity);
+
+                // 텍스트 넣기
+                TMP_Text[] texts = newtextobj.GetComponentsInChildren<TMP_Text>();
+                texts[0].text = "";
+                texts[1].text = msg;
+                
+
+                // 뷰박스에 넣고 정보 갱신
+                newtextobj.transform.SetParent(uiView.content, false);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(uiView.content);
+            }
+            // 채팅 데이터가 왔을 때 처리
+            else
+            {
+                Debug.Log(msg);
+
+                //  문자열 자르기
+                var textList = msg.Split(":");
+                if (textList.Length == 2)
+                {
+                    // 오브젝트 생성
+                    var newtextobj = Instantiate(msgPrefab, Vector3.zero, Quaternion.identity);
+
+                    // 텍스트 넣기
+                    TMP_Text[] texts = newtextobj.GetComponentsInChildren<TMP_Text>();
+                    texts[0].text = textList[0];
+                    texts[1].text = textList[1];
+
+                    // 뷰박스에 넣고 정보 갱신
+                    newtextobj.transform.SetParent(uiView.content, false);
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(uiView.content);
+
+                    //  스크롤 갱신
+                    var view = uiView.transform as RectTransform;
+                    if (view.rect.height < uiView.content.rect.height)
+                    {
+                        uiView.content.anchoredPosition = new Vector2(0, uiView.content.rect.height);
+                    }
+                }
+
             }
         }
 
        
     }
 
+    IEnumerator SendInitData()
+    {
+        while(true)
+        {
+            yield return null;
 
+            // 연결이 수립될때까지 기다림. 
+            if(tcpClient == null)
+            {
+                continue;
+            }
+
+            // 서버에 자신의 이름을 한번 보내준다. 
+            // 나중에 본인 ID 받아와서 출력하게 바꾸기
+            var myName = Encoding.UTF8.GetBytes("Jiyee");
+            tcpClient.GetStream().Write(myName);
+
+
+            // 서버에 내가 몇번방에 입장했는지 한번 보내준다. 
+            // 서버는 방 번호 데이터를 일단 받아야 클라이언트를 방에 입장시키는 처리를 하기 때문. 
+            var data = Encoding.UTF8.GetBytes("/newchat " + myRoomName);
+            tcpClient.GetStream().Write(data);
+            
+            yield break;
+        }
+
+
+    }
 
     
     // TCP 연결 시도가 성공적으로 완료되었을 때 실행됨
@@ -89,10 +142,7 @@ public class ChatManager_TCP : MonoBehaviour
     {
         byte[] buf = new byte[2048];
 
-        // 서버에 내가 몇번방에 입장했는지 한번 보내준다. 
-        // 서버는 방 번호 데이터를 일단 받아야 클라이언트를 방에 입장시키는 처리를 하기 때문. 
-        var data = Encoding.UTF8.GetBytes(myRoomNum + ")" + "new client connected");
-        tcpClient.GetStream().Write(data);
+        
 
         // TCP 클라이언트의 네트워크 스트림에서 비동기적으로 데이터를 읽고,
         // 데이터를 읽은 후에는 requestCallTCP 함수를 호출하여 데이터를 처리
@@ -141,7 +191,7 @@ public class ChatManager_TCP : MonoBehaviour
 
 
         //  서버에 전송하기 (GetStream().Write)
-        var data = Encoding.UTF8.GetBytes(myRoomNum + ")" + uiID.text + ":" + uiMsg.text + "\0");
+        var data = Encoding.UTF8.GetBytes(myRoomName + " " + uiID.text + ":" + uiMsg.text + "\0");
         tcpClient.GetStream().Write(data);
 
         //  문자열 초기화
@@ -161,6 +211,8 @@ public class ChatManager_TCP : MonoBehaviour
 
         tcpClient = new TcpClient();
         tcpClient.BeginConnect(ipAddr, port, requestCall, null);
+
+        
     }
     
     

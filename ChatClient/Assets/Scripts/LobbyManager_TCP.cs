@@ -23,8 +23,6 @@ public class LobbyManager_TCP : MonoBehaviour
 
     Queue<string> msgQueue;
 
-    string roomName;
-
     [SerializeField]
     TMP_InputField roomText;
 
@@ -43,6 +41,7 @@ public class LobbyManager_TCP : MonoBehaviour
 
         ConnectTCP();
 
+
         // 방 목록 가져오는 코루틴 시작. 3초마다 갱신함. 
         StartCoroutine("GetRoomList");
     }
@@ -55,39 +54,35 @@ public class LobbyManager_TCP : MonoBehaviour
         {
             var msg = msgQueue.Dequeue();
 
-            //  문자열 자르기
-            var textList = msg.Split(" : ");
+            Debug.Log("Received from Server : " + msg);
 
-
-            if (textList[0] == "200")
+            if (msg.StartsWith("200"))
             {
-                GameObject.Find("GameManager").GetComponent<GameManager>().myRoomNum = textList[1];
+                var textList = msg.Split(":");
+
+                // 맨 마지막 문자열의 공백 제거 후 GameManager에 방 번호를 저장해준다. 
+                GameObject.Find("GameManager").GetComponent<GameManager>().myRoomName = textList[1].TrimEnd('\0');
                 SceneManager.LoadScene("ChatScene");
             }
 
-            // 방 목록이 들어오면
-            if (textList[0] == "Available_rooms")
+            // 방 목록 처리
+            if (msg.StartsWith("/list"))
             {
-                var roomInfo = textList[1].Split("and");
+                var textList = msg.Split(":");
+                var roomNameList = textList[1].Split(", ");
 
-                var roomList = roomInfo[0].Split(", ");
-                var userCount = roomInfo[1].Split(", ");
-
-                Debug.Log(roomInfo[0]);
-                Debug.Log(roomInfo[1]);
-                Debug.Log(roomList[0]);
-                Debug.Log(userCount[2]);
-
-
-                SetRoomList(roomList, userCount);
+                SetRoomList(roomNameList);
             }
         }
 
     }
 
+    // 약 3초에 한번 /list 명령어 보냄
     IEnumerator GetRoomList()
     {
-        while(true)
+        yield return new WaitForSecondsRealtime(1.5f);
+
+        while (true)
         {
             if (tcpClient == null || !tcpClient.Connected) continue;
 
@@ -99,66 +94,31 @@ public class LobbyManager_TCP : MonoBehaviour
     }
 
 
-    int flag = 0;
-
-    void SetRoomList(string[] roomList, string[] userCount)
+    //void SetRoomList(string[] roomNameList, string[] userCountList)
+    void SetRoomList(string[] roomNameList)
     {
-        int cnt = content.transform.childCount;
-
-        // 현재 내 방제목이 서버에서 보내준 방제목과 같을 때 인원수만 갱신. 
-        for (int i = 0 ;  i < cnt; i++)
+       for(int i = 0; i < roomNameList.Length; i++)
         {
-            Transform roomObj = content.transform.GetChild(i);
-
-            TMP_Text[] texts = roomObj.GetComponentsInChildren<TMP_Text>();
+            // 오브젝트 생성
+            var newtextobj = Instantiate(roomPrefab, Vector3.zero, Quaternion.identity);
+            string roomName = roomNameList[i];
 
             // 텍스트 넣기
-            for(int j = 0; j<roomList.Length; j++)
+            TMP_Text[] texts = newtextobj.GetComponentsInChildren<TMP_Text>();
+            texts[0].text = roomName;
+
+            // 버튼 리스너 달아줌
+            Button enterBtn = newtextobj.GetComponentInChildren<Button>();
+            enterBtn.onClick.AddListener(() =>
             {
-                if(texts[0].text == roomList[j])
-                {
-                    texts[1].text = userCount[j] + "/10";
+                RoomEnterBtn(roomName);
+            });
 
-                    // 반영한 유저수는 삭제하기 위해 -1 대입. 
-                    userCount[j] = "-1";
-                }
-            }
+
+            // 뷰박스에 넣고 정보 갱신
+            newtextobj.transform.SetParent(uiView.content, false);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(uiView.content);
         }
-
-        // 새로운 방이 생겼다면(데이터가 반영이 안됨) 방 prefab을 새로 만들어준다. 
-        // 새로 방 prefab을 추가해 데이터를 적용해준다. 
-        for (int j = 0; j < roomList.Length; j++)
-        {
-            if (userCount[j] != "-1")
-            {
-                var newRoomList = Instantiate(roomPrefab, Vector3.zero, Quaternion.identity);
-
-                TMP_Text[] texts = newRoomList.GetComponentsInChildren<TMP_Text>();
-
-                texts[0].text = roomList[j];
-                texts[1].text = userCount[j] + "/10";
-
-                // 뷰박스에 넣고 정보 갱신
-                newRoomList.transform.SetParent(uiView.content, false);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(uiView.content);
-
-                //  스크롤 갱신
-                var view = uiView.transform as RectTransform;
-                if (view.rect.height < uiView.content.rect.height)
-                {
-                    uiView.content.anchoredPosition = new Vector2(0, uiView.content.rect.height);
-                }
-            }
-
-        }
-
-        if(flag == 0)
-        {
-            SetBtn();
-            flag++;
-        }
-
-        //SetBtn();
     }
 
     /// <summary>
@@ -169,12 +129,22 @@ public class LobbyManager_TCP : MonoBehaviour
     {
         byte[] buf = new byte[512];
 
+
+        // 나중에 본인 ID 받아와서 출력하게 바꾸기
+        var data = Encoding.UTF8.GetBytes("Jiyee");
+        tcpClient.GetStream().Write(data);
+
+
+
         // TCP 클라이언트의 네트워크 스트림에서 비동기적으로 데이터를 읽고,
         // 데이터를 읽은 후에는 OnTCPDataReceived 함수를 호출하여 데이터를 처리
         tcpClient.GetStream().BeginRead(buf, 0, buf.Length, OnTCPDataReceived, buf);
     }
 
     // 수신된 데이터가 처리되는 함수
+    // TCP 통신에서 데이터를 수신할 때, 데이터를 처리하는 작업은 비동기적으로 이루어집니다.
+    // 따라서 데이터가 도착하는 순서와 처리하는 순서가 일치하지 않을 수 있습니다.
+    // 이를 관리하기 위해 데이터를 큐에 넣어 처리 대기열을 관리합니다.
     private void OnTCPDataReceived(System.IAsyncResult ar)
     {
         try
@@ -184,7 +154,6 @@ public class LobbyManager_TCP : MonoBehaviour
             if (byteRead > 0)
             {
                 byte[] data = (byte[])ar.AsyncState;
-                string msg = Encoding.UTF8.GetString(data);
 
                 msgQueue.Enqueue(Encoding.UTF8.GetString(data));
 
@@ -192,65 +161,59 @@ public class LobbyManager_TCP : MonoBehaviour
             }
             else
             {
+                // 연결이 끊어지면 프로그램 종료. 
                 tcpClient.GetStream().Close();
                 tcpClient.Close();
                 tcpClient = null;
+
+                Application.Quit();
             }
         }
         catch (SocketException e)
         {
             Debug.LogException(e);
+            Application.Quit();
         }
     }
 
-
-    public void SetBtn()
+    // 테스트용 버튼 리스너, 추후 삭제하기
+    public void TestBtn()
     {
-        // 방 입장 버튼 init
-        // 버튼에 onClick 리스너 등록, 방 번호는 0번부터 차례로 시작 
-        int cnt = content.transform.childCount;
-        for(int i = 0; i < cnt; i++)
-        {
-            Transform btn = content.transform.GetChild(i);
-            int index = i;
-            btn.GetComponentInChildren<Button>().onClick.AddListener(() => 
-            {
-                EnterBtn(index);
-            });
-        }
+        if (tcpClient == null || !tcpClient.Connected) return;
 
+        //  서버에 전송하기 (GetStream().Write)
+        var data = Encoding.UTF8.GetBytes("/join " + "hello_world");
+        Debug.Log(data.ToString());
+        tcpClient.GetStream().Write(data);
     }
 
 
     // 방 입장 버튼 리스너
-    public void EnterBtn(int btnNum)
+    public void RoomEnterBtn(string btnName)
     {
-        Debug.Log("btnNum: " + btnNum);
+        Debug.Log("Clicked Button: " + btnName);
         if (tcpClient == null || !tcpClient.Connected) return;
 
         //  서버에 전송하기 (GetStream().Write)
-        var data = Encoding.UTF8.GetBytes("/join " + btnNum.ToString());
+        var data = Encoding.UTF8.GetBytes("/join " + btnName);
         tcpClient.GetStream().Write(data);
-
     }
 
-    // 로비의 방 생성 버튼, 방제목 입력 Canvas 띄워줌. 수동으로 달아줌. 
+    // 로비 상단의 방 생성 버튼, 방제목 입력 Canvas 띄워줌. 수동으로 달아줌. 
     public void CreateBtnInLobby()
     {
         createRoomCanvas.SetActive(true);
-
-
     }
 
-    // 방 생성 버튼, 수동으로 달아줌. 
+    // 방 생성 패널의 방 생성 버튼, 수동으로 달아줌. 
     public void CreateBtn()
     {
         if (tcpClient == null || !tcpClient.Connected) return;
 
 
         //  서버에 전송하기 (GetStream().Write)
-        roomName = roomText.text;
-        Debug.Log("btn: create" + roomName);
+        string roomName = roomText.text;
+        Debug.Log("btn: create " + roomName);
 
         var data = Encoding.UTF8.GetBytes("/create " + roomName);
         tcpClient.GetStream().Write(data);
@@ -268,9 +231,6 @@ public class LobbyManager_TCP : MonoBehaviour
 
     public void ConnectTCP()
     {
-        if (tcpClient != null)
-            return;
-
         tcpClient = new TcpClient();
         tcpClient.BeginConnect(ipAddr, port, StartReadingTCP, null);
     }
@@ -278,6 +238,9 @@ public class LobbyManager_TCP : MonoBehaviour
 
     private void OnDestroy()
     {
+        // 방목록을 받아오고 세팅하는 코루틴들 종료
+        StopAllCoroutines();
+
         if (tcpClient != null)
         {
             tcpClient.GetStream().Close();
@@ -285,8 +248,6 @@ public class LobbyManager_TCP : MonoBehaviour
             tcpClient = null;
         }
 
-        // 방목록을 받아오고 세팅하는 코루틴들 종료
-        StopAllCoroutines();
     }
     
 }

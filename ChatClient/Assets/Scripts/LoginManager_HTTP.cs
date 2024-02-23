@@ -29,21 +29,21 @@ public class LoginManager_HTTP : MonoBehaviour
     {
         username = UserName.GetComponent<TMP_InputField>().text;
         password = Password.GetComponent<TMP_InputField>().text;
-        StartCoroutine(SendLoginRequest());
+        StartCoroutine(LoginRequest());
     }
 
     public void SignUpBtn()
     {
         username = UserName.GetComponent<TMP_InputField>().text;
         password = Password.GetComponent<TMP_InputField>().text;
-        StartCoroutine(SendSignUpRequest());
+        StartCoroutine(SignUpRequest());
     }
 
     // 네트워크 작업은 시간이 오래 걸릴 수 있고, 이 작업이 완료될 때까지 대기해야 한다.
     // 코루틴은 이러한 작업을 비동기적으로 처리하고, 작업이 완료될 때까지 기다릴 수 있게 해준다.
     // 또한 코루틴은 Unity에서 네트워크 작업과 같은 긴 작업을 실행할 때 일종의 스레드처럼 동작하여,
     // 메인 스레드를 차단하지 않으면서도 시간이 오래 걸리는 작업을 수행할 수 있도록 해준다.
-    IEnumerator SendLoginRequest()
+    IEnumerator LoginRequest()
     {
         // 요청을 보낼 URL
         string uri = "https://localhost:7270/account/login";
@@ -88,7 +88,7 @@ public class LoginManager_HTTP : MonoBehaviour
         }
     }
 
-    IEnumerator SendSignUpRequest()
+    IEnumerator SignUpRequest()
     {
         // 요청을 보낼 URL
         string uri = "https://localhost:7270/account/register";

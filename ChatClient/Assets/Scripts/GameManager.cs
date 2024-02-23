@@ -11,8 +11,8 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
 
-    // LobbyManager로부터 내가 접속할 방 번호 받아옴
-    public string myRoomNum;
+    // LobbyManager로부터 내가 접속할 방 제목 받아옴
+    public string myRoomName;
 
     public string sessionKey;
 
