@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading;
 using System;
 using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
 
 public class ChatManager_TCP : MonoBehaviour
@@ -36,16 +37,20 @@ public class ChatManager_TCP : MonoBehaviour
 
     public string myRoomName;
 
+    public TMP_Text roomName;
+
     public void Start()
     {
         myRoomName = GameObject.Find("GameManager").GetComponent<GameManager>().myRoomName;
-
+        // 내 방제목 표시
+        roomName.text = myRoomName;
         //  메시지 큐
         msgQueue = new Queue<string>();
 
         ConnectTCP();
 
         StartCoroutine(SendInitData());
+
     }
 
 
@@ -55,6 +60,7 @@ public class ChatManager_TCP : MonoBehaviour
         {
             var msg = msgQueue.Dequeue();
 
+            Debug.Log("ChatScene : Received from Server  " + msg);
 
             // 방 입장했다는 메세지 처리
             if (msg.StartsWith("Joined room: "))
@@ -136,7 +142,12 @@ public class ChatManager_TCP : MonoBehaviour
 
     }
 
-    
+    public void ExitBtn()
+    {
+        SceneManager.LoadScene("LobbyScene");
+    }
+
+
     // TCP 연결 시도가 성공적으로 완료되었을 때 실행됨
     private void requestCall(System.IAsyncResult ar)
     {
@@ -160,7 +171,14 @@ public class ChatManager_TCP : MonoBehaviour
             {
                 byte[] data = (byte[])ar.AsyncState;
 
-                msgQueue.Enqueue(Encoding.UTF8.GetString(data));
+                string msg = Encoding.UTF8.GetString(data);
+
+                var texts = msg.Split("\0");
+
+                Debug.Log("큐에 들어간 데이터 " + texts[0]);
+
+                //msgQueue.Enqueue(Encoding.UTF8.GetString(data));
+                msgQueue.Enqueue(texts[0]);
 
                 // 다시 데이터를 읽기 시작. 
                 tcpClient.GetStream().BeginRead(data, 0, data.Length, requestCallTCP, data);

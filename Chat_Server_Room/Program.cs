@@ -9,19 +9,19 @@ using System.Threading;
 public class ChatRoom
 {
     public string Name { get; }
-    public List<TcpClient> Clients = new List<TcpClient>();
+    public List<Socket> Clients = new List<Socket>();
 
     public ChatRoom(string name)
     {
         Name = name;
     }
 
-    public void BroadcastMessage(string message, TcpClient sender)
+    public void BroadcastMessage(string message, Socket sender)
     {
         byte[] buffer = Encoding.UTF8.GetBytes(message);
-        foreach (TcpClient client in Clients)
+        foreach (Socket client in Clients)
         {
-            NetworkStream stream = client.GetStream();
+            NetworkStream stream = new NetworkStream(client);
             stream.Write(buffer, 0, buffer.Length);
             stream.Flush();
 
@@ -32,10 +32,10 @@ public class ChatRoom
         }
     }
 
-    public void AddClient(TcpClient client)
+    public void AddClient(Socket client)
     {
         // 이미 client가 list에 담겨 있는 상태라면 바로 함수를 종료한다. 
-        foreach(TcpClient c in Clients)
+        foreach(Socket c in Clients)
         {
             if (c == client) return;
         }
@@ -43,7 +43,7 @@ public class ChatRoom
         Clients.Add(client);
     }
 
-    public void RemoveClient(TcpClient client)
+    public void RemoveClient(Socket client)
     {
         Clients.Remove(client);
     }
@@ -51,21 +51,17 @@ public class ChatRoom
 
 public class ChatServer
 {
-    private TcpListener listener;
     public static Dictionary<string, ChatRoom> rooms = new Dictionary<string, ChatRoom>();
 
     // 현재 내가 접속한 방 정보
     public ChatRoom currentRoom;
 
 
-    public ChatServer(int port)
-    {
-        listener = new TcpListener(IPAddress.Any, port);
-    }
-
     public void Start()
     {
-        listener.Start();
+        TcpListener serverSocket = new TcpListener(IPAddress.Any, 9999);
+
+        serverSocket.Start();
         Console.WriteLine("Chat server started...");
 
 
@@ -98,18 +94,18 @@ public class ChatServer
 
         while (true)
         {
-            TcpClient client = listener.AcceptTcpClient();
-            Console.WriteLine("Client connected: " + client.Client.RemoteEndPoint);
+            Socket clientSocket = serverSocket.AcceptSocket();
+            Console.WriteLine("Client connected: " + clientSocket.RemoteEndPoint);
 
-            Thread clientThread = new Thread(HandleClient);
-            clientThread.Start(client);
+            Thread clientThread = new Thread(() => HandleClient(clientSocket));
+            clientThread.Start();
         }
     }
 
-    private void HandleClient(object obj)
+    private void HandleClient(Socket clientSocket)
     {
-        TcpClient clientSocket = (TcpClient)obj;
-        NetworkStream stream = clientSocket.GetStream();
+        NetworkStream networkStream = new NetworkStream(clientSocket);
+
 
         byte[] buffer = new byte[2048];
         int bytesRead;
@@ -118,13 +114,13 @@ public class ChatServer
 
         // Get client's name
         // 클라이언트는 최초 접속시 자신의 이름을 보내준다. 
-        int bytesReceived = stream.Read(buffer, 0, buffer.Length);
-        string clientName = Encoding.ASCII.GetString(buffer, 0, bytesReceived);
+        bytesRead = networkStream.Read(buffer, 0, buffer.Length);
+        string clientName = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
 
         try
         {
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+            while ((bytesRead = networkStream.Read(buffer, 0, buffer.Length)) > 0)
             {
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
@@ -142,7 +138,8 @@ public class ChatServer
                         if (rooms.ContainsKey(roomName))
                         {
                             // 방 접속 승인, 진짜 방 입장은 ChatScene에서 이루어짐
-                            SendMessage("200:" + roomName, clientSocket);
+                            string msg = "200:" + roomName;
+                            SendMessage(msg, clientSocket);
                         }
                     }
                     else
@@ -167,7 +164,7 @@ public class ChatServer
                 }
                 else if (message.StartsWith("/list"))
                 {
-                    //SendRoomList(clientSocket);
+                    SendRoomList(clientSocket);
                 }
                 // 로비에서 접속을 끊고 채팅방으로 이동(새로운 접속) 후의 상황. 
                 // 클라이언트에서 방 제목도 같이 보내준다. ex. "/newchat [room_name]"
@@ -191,7 +188,14 @@ public class ChatServer
                         string roomName = parts[0];
                         string responseData = parts[1];
 
-                        currentRoom.BroadcastMessage(responseData, clientSocket);
+                        foreach(ChatRoom r in rooms.Values)
+                        {
+                            if (r.Name == roomName)
+                            {
+                                r.BroadcastMessage(responseData, clientSocket);
+                            }
+                           
+                        }
                     }
                 }
             }
@@ -208,15 +212,16 @@ public class ChatServer
         }
     }
 
-    private void SendMessage(string message, TcpClient clientSocket)
+    private void SendMessage(string message, Socket clientSocket)
     {
-        byte[] buffer = Encoding.UTF8.GetBytes(message);
-        NetworkStream stream = clientSocket.GetStream();
-        stream.Write(buffer, 0, buffer.Length);
-        stream.Flush();
+        byte[] buffer = Encoding.UTF8.GetBytes(message+"\0");
+        NetworkStream networkStream = new NetworkStream(clientSocket);
+        networkStream.Write(buffer, 0, buffer.Length);
+        networkStream.Flush();
+
     }
 
-    private void JoinRoom(TcpClient clientSocket, string clientName, string roomName)
+    private void JoinRoom(Socket clientSocket, string clientName, string roomName)
     {
         if (rooms.ContainsKey(roomName))
         {
@@ -232,12 +237,20 @@ public class ChatServer
         }
     }
 
-    private void SendRoomList(TcpClient clientSocket)
+    private void SendRoomList(Socket clientSocket)
     {
-        SendMessage("/list:" + string.Join(", ", rooms.Keys), clientSocket);
+        string roomList = string.Join(", ", rooms.Keys);
+        List<string> userCount = new List<string>();
+        foreach (ChatRoom r in rooms.Values)
+        {
+            userCount.Add(r.Clients.Count.ToString());
+        }
+        string userCountList = string.Join(", ", userCount);
+
+        SendMessage("/list:" + roomList + "&" + userCountList, clientSocket);
     }
 
-    private void CreateRoom(TcpClient clientSocket, string roomName)
+    private void CreateRoom(Socket clientSocket, string roomName)
     {
         var checkSpace = roomName.Split(' ');
         if (checkSpace.Length > 2 )
@@ -264,8 +277,7 @@ public class ChatServer
 
     public static void Main(string[] args)
     {
-        int port = 9999; // Change this to desired port number
-        ChatServer server = new ChatServer(port);
+        ChatServer server = new ChatServer();
         server.Start();
 
         

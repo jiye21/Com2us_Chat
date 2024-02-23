@@ -54,7 +54,7 @@ public class LobbyManager_TCP : MonoBehaviour
         {
             var msg = msgQueue.Dequeue();
 
-            Debug.Log("Received from Server : " + msg);
+            Debug.Log("LoginScene : Received from Server  " + msg);
 
             if (msg.StartsWith("200"))
             {
@@ -69,9 +69,16 @@ public class LobbyManager_TCP : MonoBehaviour
             if (msg.StartsWith("/list"))
             {
                 var textList = msg.Split(":");
-                var roomNameList = textList[1].Split(", ");
+                var roomInfo = textList[1].Split("&");
 
-                SetRoomList(roomNameList);
+                var roomNameList = roomInfo[0].Split(", ");
+                var userCount = roomInfo[1].Split(", ");
+
+                // 맨 마지막 문자열의 공백 제거
+                userCount[userCount.Length - 1] = userCount[userCount.Length - 1].TrimEnd('\0');
+
+
+                SetRoomList(roomNameList, userCount);
             }
         }
 
@@ -80,10 +87,9 @@ public class LobbyManager_TCP : MonoBehaviour
     // 약 3초에 한번 /list 명령어 보냄
     IEnumerator GetRoomList()
     {
-        yield return new WaitForSecondsRealtime(1.5f);
-
         while (true)
         {
+            yield return null;
             if (tcpClient == null || !tcpClient.Connected) continue;
 
             var data = Encoding.UTF8.GetBytes("/list");
@@ -94,31 +100,69 @@ public class LobbyManager_TCP : MonoBehaviour
     }
 
 
-    //void SetRoomList(string[] roomNameList, string[] userCountList)
-    void SetRoomList(string[] roomNameList)
+    void SetRoomList(string[] roomNameList, string[] userCountList)
     {
-       for(int i = 0; i < roomNameList.Length; i++)
+        int cnt = content.transform.childCount;
+
+        // 현재 내 방제목이 서버에서 보내준 방제목과 같을 때 인원수만 갱신. (버튼에 달린 방제목 수정 불필요. )
+        for (int i = 0; i < cnt; i++)
         {
-            // 오브젝트 생성
-            var newtextobj = Instantiate(roomPrefab, Vector3.zero, Quaternion.identity);
-            string roomName = roomNameList[i];
+            Transform roomObj = content.transform.GetChild(i);
+
+            TMP_Text[] texts = roomObj.GetComponentsInChildren<TMP_Text>();
 
             // 텍스트 넣기
-            TMP_Text[] texts = newtextobj.GetComponentsInChildren<TMP_Text>();
-            texts[0].text = roomName;
-
-            // 버튼 리스너 달아줌
-            Button enterBtn = newtextobj.GetComponentInChildren<Button>();
-            enterBtn.onClick.AddListener(() =>
+            for (int j = 0; j < roomNameList.Length; j++)
             {
-                RoomEnterBtn(roomName);
-            });
+                if (texts[0].text == roomNameList[j])
+                {
+                    texts[1].text = userCountList[j] + "/10";
 
-
-            // 뷰박스에 넣고 정보 갱신
-            newtextobj.transform.SetParent(uiView.content, false);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(uiView.content);
+                    // 반영한 유저수는 삭제하기 위해 null 대입. 
+                    userCountList[j] = null;
+                }
+            }
         }
+
+
+        // 새로운 방이 생겼다면(=데이터가 반영이 안되었다면) 방 prefab을 새로 만들어준다. 
+        // 새로 방 prefab을 추가해 데이터를 적용해준다. 
+        for (int i = 0; i < roomNameList.Length; i++)
+        {
+            if (userCountList[i] != null)
+            {
+                // 오브젝트 생성
+                var newtextobj = Instantiate(roomPrefab, Vector3.zero, Quaternion.identity);
+                string roomName = roomNameList[i];
+
+                // 텍스트 넣기
+                TMP_Text[] texts = newtextobj.GetComponentsInChildren<TMP_Text>();
+                texts[0].text = roomName;
+                texts[1].text = userCountList[i] + "/10";
+
+                // 버튼 리스너 달아줌
+                Button enterBtn = newtextobj.GetComponentInChildren<Button>();
+                enterBtn.onClick.AddListener(() =>
+                {
+                    RoomEnterBtn(roomName);
+                });
+
+
+                // 뷰박스에 넣고 정보 갱신
+                newtextobj.transform.SetParent(uiView.content, false);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(uiView.content);
+
+                //  스크롤 갱신
+                var view = uiView.transform as RectTransform;
+                if (view.rect.height < uiView.content.rect.height)
+                {
+                    uiView.content.anchoredPosition = new Vector2(0, uiView.content.rect.height);
+                }
+            }
+
+        }
+
+
     }
 
     /// <summary>
@@ -155,7 +199,14 @@ public class LobbyManager_TCP : MonoBehaviour
             {
                 byte[] data = (byte[])ar.AsyncState;
 
-                msgQueue.Enqueue(Encoding.UTF8.GetString(data));
+                string msg = Encoding.UTF8.GetString(data);
+
+                var texts = msg.Split("\0");
+
+                Debug.Log("큐에 들어간 데이터 " + texts[0]);
+
+                //msgQueue.Enqueue(Encoding.UTF8.GetString(data));
+                msgQueue.Enqueue(texts[0]);
 
                 tcpClient.GetStream().BeginRead(data, 0, data.Length, OnTCPDataReceived, data);
             }
@@ -176,17 +227,7 @@ public class LobbyManager_TCP : MonoBehaviour
         }
     }
 
-    // 테스트용 버튼 리스너, 추후 삭제하기
-    public void TestBtn()
-    {
-        if (tcpClient == null || !tcpClient.Connected) return;
-
-        //  서버에 전송하기 (GetStream().Write)
-        var data = Encoding.UTF8.GetBytes("/join " + "hello_world");
-        Debug.Log(data.ToString());
-        tcpClient.GetStream().Write(data);
-    }
-
+    
 
     // 방 입장 버튼 리스너
     public void RoomEnterBtn(string btnName)
