@@ -50,8 +50,8 @@ namespace Controllers
 
         {
             // 세션에서 사용자 ID를 가져옴
-            var userId = HttpContext.Session.GetString("UserId");
-            if (userId == null)
+            var userNum = HttpContext.Session.GetString("userNum");
+            if (userNum == null)
             {
                 return Unauthorized("User not logged in");
             }
@@ -60,7 +60,7 @@ namespace Controllers
             using (MySqlConnection connection = await Database.GetMySqlConnetion())
             {
                 UserInfo userInfo = await connection.QuerySingleOrDefaultAsync<UserInfo>(
-                    "SELECT * FROM Users WHERE Id = @Id", new { Id = userId });
+                    "SELECT * FROM Users WHERE userNum = @userNum", new { Id = userNum });
 
                 return Ok(userInfo);
             }
@@ -74,29 +74,21 @@ namespace Controllers
             {
                 // 이미 등록된 사용자인지 확인
                 UserInfo existingUser = await connection.QuerySingleOrDefaultAsync<UserInfo>(
-                    "SELECT * FROM Users WHERE LoginId = @loginId", new { loginId = registerRequest.LoginId });         //쿼리문확인해서 existingUser에 저장
+                    "SELECT * FROM Users WHERE userID = @userId", new { userId = registerRequest.userID });         //쿼리문확인해서 existingUser에 저장
 
                 //회원가입 유무  existingUser이 null이어야 가능
                 if (existingUser != null)
                 {
-<<<<<<< HEAD
                     return new string[] { "User with the same login ID already exists " };
                     //return BadRequest("User with the same login ID already exists ");
                     //return StatusCode((int)ErrorCode.LogoutFail);
-=======
-
-                    return new string[] { "User with the same login ID already exists " };
-                    //return BadRequest("User with the same login ID already exists ");
-                    //return StatusCode((int)ErrorCode.LogoutFail);
-
->>>>>>> main
                 } 
 
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);               // 입력한 비밀번호를 해쉬화해서 저장
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.userPW);               // 입력한 비밀번호를 해쉬화해서 저장
 
                 await connection.ExecuteAsync(
-                    "INSERT INTO Users (LoginId, PasswordHash) VALUES (@loginId, @passwordHash)",
-                    new { loginId = registerRequest.LoginId, passwordHash = hashedPassword });
+                    "INSERT INTO Users (userID, userPW) VALUES (@userId, @userPW)",
+                    new { userId = registerRequest.userID, userPW = hashedPassword });
 
                 // Redis에 새 사용자 정보 저장
                // await _redisCache.SetStringAsync(registerRequest.LoginId, "registered");
@@ -107,57 +99,60 @@ namespace Controllers
         }
 
         [HttpPost("login")]             // 라우팅 경로에 추가 되는 부분
-        public async Task<IEnumerable<string>> Login(LoginRequest loginRequest)                   // 데이터베이스 쿼리는 I/O 작업이기 때문에 비동기
+        public async Task<IActionResult> Login(LoginRequest loginRequest)                   // 데이터베이스 쿼리는 I/O 작업이기 때문에 비동기
         {
-            using (MySqlConnection connection = await Database.GetMySqlConnetion())         // 데이터 베이스 연결
-
+            try
             {
-                // 데이터베이스에서 해당 로그인 아이디의 사용자 정보를 가져옴
-                UserInfo userInfo = await connection.QuerySingleOrDefaultAsync<UserInfo>(
-                    "SELECT * FROM Users WHERE LoginId = @loginId", new { loginId = loginRequest.LoginId });        //쿼리문을 실행해서 결과를 userInfo에 담기
-
-                // 사용자가 없거나 비밀번호가 일치하지 않으면 로그인 실패
-                if (userInfo == null )
+                using (MySqlConnection connection = await Database.GetMySqlConnetion())         // 데이터 베이스 연결
                 {
-                    return new string[] {"no user"};
-                    //return ErrorCode.LoginFailUserNotExist;
+                    // 데이터베이스에서 해당 로그인 아이디의 사용자 정보를 가져옴
+                    UserInfo userInfo = await connection.QuerySingleOrDefaultAsync<UserInfo>(
+                        "SELECT * FROM Users WHERE userID = @userId", new { userId = loginRequest.userID });        //쿼리문을 실행해서 결과를 userInfo에 담기
+                    // 사용자가 없거나 비밀번호가 일치하지 않으면 로그인 실패
+                    if (userInfo == null)
+                    {
+                        return BadRequest(new { result = "no user" });
+                        //return new string[] {"no user"};
+                        //return ErrorCode.LoginFailUserNotExist;
+                    }
+                    bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(loginRequest.userPW, userInfo.userPW);
+                    if (!isPasswordCorrect)
+                    {
+                        return BadRequest(new { result = "no password" });
+                        //return new string[] { "no password" };
+                        //return ErrorCode.LoginFail;
+                    }
+                    string sessionId = Guid.NewGuid().ToString();
+                    //새로운 GUID(전역 고유 식별자)를 생성하고 이를 문자열로 변환하는 것입니다.
+                    //GUID는 매우 난수적이며 중복될 가능성이 매우 낮은 값으로, 일반적으로 고유한 식별자를 생성하는 데 사용됩니다.
+                    // Redis에 세션 ID와 사용자 ID 저장
+                    await _redisCache.SetStringAsync(sessionId, userInfo.userNum.ToString());        // redis에 (key, value)를 저장
+                    var value = await _redisCache.GetStringAsync(sessionId);                    // value값을 보기위함
+                                                                                                // 클라이언트에게 세션 ID를 쿠키로 전달
+                    HttpContext.Response.Cookies.Append("sessionId", sessionId);                // 클라이언트 브라우저에 세션 ID를 쿠키로 전달...
+                    Console.WriteLine($"Session Key: {loginRequest.userID} {sessionId}, Value: {value}");
+                    Console.WriteLine($"HttpContext.sessionId : {sessionId}");
+                    // 클라이언트에게 세션키 전달
+                    JsonResult jsonResult = new JsonResult(new { result = "성공", sessionId, username = loginRequest.userID });
+                    return jsonResult;
                 }
-
-                bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(loginRequest.Password, userInfo.PasswordHash);
-                if (!isPasswordCorrect)
-                {
-                    return new string[] { "no password" };
-                    //return ErrorCode.LoginFail;
-                }
-
-                string sessionId = Guid.NewGuid().ToString();
-                //새로운 GUID(전역 고유 식별자)를 생성하고 이를 문자열로 변환하는 것입니다.
-                //GUID는 매우 난수적이며 중복될 가능성이 매우 낮은 값으로, 일반적으로 고유한 식별자를 생성하는 데 사용됩니다.
-
-                // Redis에 세션 ID와 사용자 ID 저장
-                await _redisCache.SetStringAsync(sessionId, userInfo.Id.ToString());        // redis에 (key, value)를 저장
-                var value = await _redisCache.GetStringAsync(sessionId);                    // value값을 보기위함
-                // 클라이언트에게 세션 ID를 쿠키로 전달
-                HttpContext.Response.Cookies.Append("sessionId", sessionId);                // 클라이언트 브라우저에 세션 ID를 쿠키로 전달...
-
-                Console.WriteLine($"Session Key: {loginRequest.LoginId} {sessionId}, Value: {value}");
-                Console.WriteLine($"HttpContext.sessionId : {sessionId}");
-
-                return new string[] { "성공", sessionId };
-                //return (ErrorCode.None);
-
-
+            }
+            catch (Exception ex)
+            {
+                // 예외 처리 코드
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, new { result = "서버 오류" });
             }
         }
 
-        [HttpDelete("delete/{Id}")]
-        public async Task<IActionResult> Delete(int Id)
+        [HttpDelete("delete/{userID}")]
+        public async Task<IActionResult> Delete(int userID)
         {
             using (MySqlConnection connection = await Database.GetMySqlConnetion())
             {
                 // 해당 ID를 가진 사용자가 존재하는지 확인
                 UserInfo existingUser = await connection.QuerySingleOrDefaultAsync<UserInfo>(
-                    "SELECT * FROM Users WHERE Id = @id", new { Id });
+                    "SELECT * FROM Users WHERE userID = @userID", new { userID });
 
                 if (existingUser == null)
                 {
@@ -165,10 +160,10 @@ namespace Controllers
                 }
 
                 // 사용자 삭제
-                await connection.ExecuteAsync("DELETE FROM Users WHERE Id = @id", new { Id });
+                await connection.ExecuteAsync("DELETE FROM Users WHERE userID = @userID", new { userID });
 
                 // Redis에서 사용자 정보 제거
-                await _redisCache.RemoveAsync(existingUser.LoginId);
+                await _redisCache.RemoveAsync(existingUser.userID);
 
                 return Ok("User deleted successfully");
             }
