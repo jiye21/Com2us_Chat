@@ -39,8 +39,14 @@ public class ChatManager_TCP : MonoBehaviour
 
     public TMP_Text roomName;
 
+    private string username;
+
+
     public void Start()
     {
+        // GameManager에서 받아온 username을 전역 변수에 저장
+        username = GameObject.Find("GameManager").GetComponent<GameManager>().Username;
+
         myRoomName = GameObject.Find("GameManager").GetComponent<GameManager>().myRoomName;
         // 내 방제목 표시
         roomName.text = myRoomName;
@@ -126,8 +132,7 @@ public class ChatManager_TCP : MonoBehaviour
             }
 
             // 서버에 자신의 이름을 한번 보내준다. 
-            // 나중에 본인 ID 받아와서 출력하게 바꾸기
-            var myName = Encoding.UTF8.GetBytes("Jiyee");
+            var myName = Encoding.UTF8.GetBytes(username);
             tcpClient.GetStream().Write(myName);
 
 

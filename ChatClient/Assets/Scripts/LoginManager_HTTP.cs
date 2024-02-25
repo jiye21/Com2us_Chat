@@ -8,6 +8,14 @@ using UnityEngine.SceneManagement;
 
 public class LoginManager_HTTP : MonoBehaviour
 {
+    public class ServerResponse
+    {
+        public string result;
+        public string sessionId;
+        public string username;
+    }
+
+
     public GameObject UserName;
     public GameObject Password;
 
@@ -49,8 +57,7 @@ public class LoginManager_HTTP : MonoBehaviour
         string uri = "https://localhost:7270/account/login";
 
 
-        //string loginData = "{\"loginId\":\"junmo\", \"Password\":\"1234\"}";
-        string loginData = $"{{\"loginId\":\"{username}\", \"Password\":\"{password}\"}}";
+        string loginData = $"{{\"userID\":\"{username}\", \"userPW\":\"{password}\"}}";
 
 
         // UnityWebRequest를 사용하여 POST 요청을 보냄
@@ -79,7 +86,18 @@ public class LoginManager_HTTP : MonoBehaviour
             // 서버 응답을 받아서 처리
             // downloadHandler는 UnityWebRequest의 속성 중 하나로, HTTP 응답 데이터를 처리한다.
             // .text는 HTTP 응답의 본문을 텍스트 형식으로 가져온다. 
-            Debug.Log("서버 응답: " + request.downloadHandler.text);
+            //Debug.Log("서버 응답: " + request.downloadHandler.text);
+
+            // 서버 응답을 ServerResponse 객체로 파싱
+            ServerResponse serverResponse = JsonUtility.FromJson<ServerResponse>(request.downloadHandler.text);
+
+            // GameManager에 결과, 세션 키 및 username 저장
+            GameManager gameManager = FindObjectOfType<GameManager>();
+
+            if (gameManager != null)
+            {
+                gameManager.SaveSessionInfo(serverResponse.result, serverResponse.sessionId, serverResponse.username);
+            }
 
             // 로그인 성공시 로비로 이동, 추후 세션 체크 조건식 필요
             SceneManager.LoadScene("LobbyScene");
@@ -95,7 +113,7 @@ public class LoginManager_HTTP : MonoBehaviour
 
 
         //string loginData = "{\"loginId\":\"junmo\", \"Password\":\"1234\"}";
-        string signupData = $"{{\"loginId\":\"{username}\", \"Password\":\"{password}\"}}";
+        string signupData = $"{{\"userID\":\"{username}\", \"userPW\":\"{password}\"}}";
 
 
         // UnityWebRequest를 사용하여 POST 요청을 보냄

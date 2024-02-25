@@ -35,6 +35,8 @@ public class LobbyManager_TCP : MonoBehaviour
     [SerializeField]
     ScrollRect uiView;
 
+    GameObject alertPanel;
+
     void Start()
     {
         msgQueue = new Queue<string>();
@@ -80,9 +82,31 @@ public class LobbyManager_TCP : MonoBehaviour
 
                 SetRoomList(roomNameList, userCount);
             }
+
+            if(msg.StartsWith("Invalid"))
+            {
+                // 경고 메세지 출력
+                alertPanel = createRoomCanvas.transform.GetChild(5).gameObject;
+                StartCoroutine(SetAlertPanel(msg));
+            }
+
         }
 
     }
+
+    // 2.5초간 경고창 출력후 사라짐
+    IEnumerator SetAlertPanel(string msg)
+    {
+        alertPanel.SetActive(true);
+        alertPanel.GetComponentInChildren<TMP_Text>().text = msg.TrimEnd('\0');
+
+        yield return new WaitForSecondsRealtime(2.5f);
+
+        alertPanel.SetActive(false);
+
+        yield break;
+    }
+
 
     // 약 3초에 한번 /list 명령어 보냄
     IEnumerator GetRoomList()
@@ -174,8 +198,14 @@ public class LobbyManager_TCP : MonoBehaviour
         byte[] buf = new byte[512];
 
 
+        // GameManager로부터 세션 정보 받아오기
+        GameManager gameManager = GameManager.Instance;
+        string sessionId = gameManager.SessionId;
+        string username = gameManager.Username;
+
         // 나중에 본인 ID 받아와서 출력하게 바꾸기
-        var data = Encoding.UTF8.GetBytes("Jiyee");
+        string sessionInfoMessage = $"/session,{sessionId},{username}";
+        var data = Encoding.UTF8.GetBytes(sessionInfoMessage);
         tcpClient.GetStream().Write(data);
 
 
@@ -202,8 +232,6 @@ public class LobbyManager_TCP : MonoBehaviour
                 string msg = Encoding.UTF8.GetString(data);
 
                 var texts = msg.Split("\0");
-
-                Debug.Log("큐에 들어간 데이터 " + texts[0]);
 
                 //msgQueue.Enqueue(Encoding.UTF8.GetString(data));
                 msgQueue.Enqueue(texts[0]);
@@ -259,8 +287,7 @@ public class LobbyManager_TCP : MonoBehaviour
         var data = Encoding.UTF8.GetBytes("/create " + roomName);
         tcpClient.GetStream().Write(data);
 
-        // Canvas 닫음
-        createRoomCanvas.SetActive(false);
+        
     }
 
     // Canvas 닫는 버튼, 수동으로 달아줌. 

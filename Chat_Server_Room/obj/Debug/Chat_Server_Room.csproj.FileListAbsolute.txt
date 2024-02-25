@@ -1,0 +1,7 @@
+C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\bin\Debug\Chat_Server.exe.config
+C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\bin\Debug\Chat_Server.exe
+C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\bin\Debug\Chat_Server.pdb
+C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server_Room.csproj.AssemblyReference.cache
+C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server_Room.csproj.CoreCompileInputs.cache
+C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server.exe
+C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server.pdb
