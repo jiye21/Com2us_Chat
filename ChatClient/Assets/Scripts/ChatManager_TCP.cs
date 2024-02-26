@@ -39,19 +39,23 @@ public class ChatManager_TCP : MonoBehaviour
 
     public TMP_Text roomName;
 
-    private string username;
-
+    string sessionId;
+    string username;
 
     public void Start()
     {
-        // GameManager에서 받아온 username을 전역 변수에 저장
-        username = GameObject.Find("GameManager").GetComponent<GameManager>().Username;
+        // GameManager로부터 세션 정보 받아오기
+        GameManager gameManager = GameManager.Instance;
+        sessionId = gameManager.SessionId;
+        username = gameManager.Username;
+        myRoomName = gameManager.myRoomName;
 
-        myRoomName = GameObject.Find("GameManager").GetComponent<GameManager>().myRoomName;
         // 내 방제목 표시
         roomName.text = myRoomName;
         //  메시지 큐
         msgQueue = new Queue<string>();
+
+
 
         ConnectTCP();
 
@@ -68,8 +72,17 @@ public class ChatManager_TCP : MonoBehaviour
 
             Debug.Log("ChatScene : Received from Server  " + msg);
 
+            // 세션이 Redis에 없을 때 연결 종료처리
+            if (msg.StartsWith("300"))
+            {
+                // 경고메세지 추후 로그인씬에 뜨게 하기
+                var textList = msg.Split(":");
+                //textList[1] + textList[2]
+
+                SceneManager.LoadScene("LoginScene");
+            }
             // 방 입장했다는 메세지 처리
-            if (msg.StartsWith("Joined room: "))
+            else if (msg.StartsWith("Joined room: "))
             {
                 // 오브젝트 생성
                 var newtextobj = Instantiate(msgPrefab, Vector3.zero, Quaternion.identity);
@@ -79,6 +92,25 @@ public class ChatManager_TCP : MonoBehaviour
                 texts[0].text = "";
                 texts[1].text = msg;
                 
+
+                // 뷰박스에 넣고 정보 갱신
+                newtextobj.transform.SetParent(uiView.content, false);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(uiView.content);
+            }
+
+            // 다른 유저가 입장했음을 알리는 메세지 처리
+            else if(msg.StartsWith("201"))
+            {
+                // 오브젝트 생성
+                var newtextobj = Instantiate(msgPrefab, Vector3.zero, Quaternion.identity);
+
+                var textList = msg.Split(":");
+
+                // 텍스트 넣기
+                TMP_Text[] texts = newtextobj.GetComponentsInChildren<TMP_Text>();
+                texts[0].text = "";
+                texts[1].text = textList[1].TrimEnd('\0');
+
 
                 // 뷰박스에 넣고 정보 갱신
                 newtextobj.transform.SetParent(uiView.content, false);
@@ -123,24 +155,24 @@ public class ChatManager_TCP : MonoBehaviour
     {
         while(true)
         {
-            yield return null;
-
             // 연결이 수립될때까지 기다림. 
-            if(tcpClient == null)
-            {
-                continue;
-            }
+            yield return null;
+            if (tcpClient == null || !tcpClient.Connected) continue;
 
-            // 서버에 자신의 이름을 한번 보내준다. 
-            var myName = Encoding.UTF8.GetBytes(username);
-            tcpClient.GetStream().Write(myName);
+
+            // sessionId와 username 전송
+            string sessionInfoMessage = $"/session,{sessionId},{username}" + "\0";
+            var data = Encoding.UTF8.GetBytes(sessionInfoMessage);
+            tcpClient.GetStream().Write(data);
 
 
             // 서버에 내가 몇번방에 입장했는지 한번 보내준다. 
             // 서버는 방 번호 데이터를 일단 받아야 클라이언트를 방에 입장시키는 처리를 하기 때문. 
-            var data = Encoding.UTF8.GetBytes("/newchat " + myRoomName);
+            data = Encoding.UTF8.GetBytes("/newchat " + myRoomName + "\0");
             tcpClient.GetStream().Write(data);
-            
+
+
+            // 코루틴 종료
             yield break;
         }
 
@@ -158,7 +190,7 @@ public class ChatManager_TCP : MonoBehaviour
     {
         byte[] buf = new byte[2048];
 
-        
+
 
         // TCP 클라이언트의 네트워크 스트림에서 비동기적으로 데이터를 읽고,
         // 데이터를 읽은 후에는 requestCallTCP 함수를 호출하여 데이터를 처리
@@ -179,8 +211,6 @@ public class ChatManager_TCP : MonoBehaviour
                 string msg = Encoding.UTF8.GetString(data);
 
                 var texts = msg.Split("\0");
-
-                Debug.Log("큐에 들어간 데이터 " + texts[0]);
 
                 //msgQueue.Enqueue(Encoding.UTF8.GetString(data));
                 msgQueue.Enqueue(texts[0]);

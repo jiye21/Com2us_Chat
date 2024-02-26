@@ -1,6 +1,6 @@
-﻿public enum EErrorCode
+﻿public enum ErrorCode
 {
-    None = 0,
+    None = 201,
 
     // 인증 관련
     CreateAccountFail = 1001,

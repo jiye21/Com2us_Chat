@@ -1,0 +1,118 @@
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\appsettings.Development.json
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\appsettings.json
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Web_API_Server.exe
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Web_API_Server.deps.json
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Web_API_Server.runtimeconfig.json
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Web_API_Server.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Web_API_Server.pdb
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\BCrypt.Net.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Dapper.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Primitives.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\MySqlConnector.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\Pipelines.Sockets.Unofficial.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\StackExchange.Redis.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\bin\Debug\net7.0\System.Security.Permissions.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_Server.csproj.AssemblyReference.cache
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_Server.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_Server.AssemblyInfoInputs.cache
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_Server.AssemblyInfo.cs
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_Server.csproj.CoreCompileInputs.cache
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_Server.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\staticwebassets.build.json
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\staticwebassets.development.json
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.Web_API_Server.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.build.Web_API_Server.props
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.buildMultiTargeting.Web_API_Server.props
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.buildTransitive.Web_API_Server.props
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\staticwebassets.pack.json
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\scopedcss\bundle\Web_API_Server.styles.css
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_.2FB77C82.Up2Date
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_Server.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\refint\Web_API_Server.dll
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_Server.pdb
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\Web_API_Server.genruntimeconfig.cache
+C:\Users\SBA\Desktop\4팀\로그인 가능, 방 입장 가능, 방 퇴장, 방 생성 제대로 안되는 버전\Web_API_Server\obj\Debug\net7.0\ref\Web_API_Server.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\appsettings.Development.json
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\appsettings.json
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Web_API_Server.exe
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Web_API_Server.deps.json
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Web_API_Server.runtimeconfig.json
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Web_API_Server.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Web_API_Server.pdb
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\BCrypt.Net.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Dapper.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Primitives.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\MySqlConnector.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\Pipelines.Sockets.Unofficial.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\StackExchange.Redis.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\bin\Debug\net7.0\System.Security.Permissions.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_Server.csproj.AssemblyReference.cache
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_Server.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_Server.AssemblyInfoInputs.cache
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_Server.AssemblyInfo.cs
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_Server.csproj.CoreCompileInputs.cache
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_Server.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\staticwebassets.build.json
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\staticwebassets.development.json
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.Web_API_Server.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.build.Web_API_Server.props
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.buildMultiTargeting.Web_API_Server.props
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.buildTransitive.Web_API_Server.props
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\staticwebassets.pack.json
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\scopedcss\bundle\Web_API_Server.styles.css
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_.2FB77C82.Up2Date
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_Server.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\refint\Web_API_Server.dll
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_Server.pdb
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\Web_API_Server.genruntimeconfig.cache
+C:\Users\SBA\Desktop\4팀\0226)\Web_API_Server\obj\Debug\net7.0\ref\Web_API_Server.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\appsettings.Development.json
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\appsettings.json
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Web_API_Server.exe
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Web_API_Server.deps.json
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Web_API_Server.runtimeconfig.json
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Web_API_Server.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Web_API_Server.pdb
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\BCrypt.Net.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Dapper.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Microsoft.Extensions.Primitives.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\MySqlConnector.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\Pipelines.Sockets.Unofficial.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\StackExchange.Redis.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\bin\Debug\net7.0\System.Security.Permissions.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.csproj.AssemblyReference.cache
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.AssemblyInfoInputs.cache
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.AssemblyInfo.cs
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.csproj.CoreCompileInputs.cache
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.sourcelink.json
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\staticwebassets.build.json
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\staticwebassets.development.json
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.Web_API_Server.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.build.Web_API_Server.props
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.buildMultiTargeting.Web_API_Server.props
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\staticwebassets\msbuild.buildTransitive.Web_API_Server.props
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\staticwebassets.pack.json
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\scopedcss\bundle\Web_API_Server.styles.css
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_.2FB77C82.Up2Date
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\refint\Web_API_Server.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.pdb
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\Web_API_Server.genruntimeconfig.cache
+C:\Users\SBA\Desktop\Com2us_Chat\Web_API_Server\obj\Debug\net7.0\ref\Web_API_Server.dll

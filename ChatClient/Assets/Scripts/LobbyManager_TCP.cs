@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -58,6 +59,7 @@ public class LobbyManager_TCP : MonoBehaviour
 
             Debug.Log("LoginScene : Received from Server  " + msg);
 
+            // 방 입장 승인 처리
             if (msg.StartsWith("200"))
             {
                 var textList = msg.Split(":");
@@ -67,20 +69,34 @@ public class LobbyManager_TCP : MonoBehaviour
                 SceneManager.LoadScene("ChatScene");
             }
 
+            // 세션이 Redis에 없을 때 연결 종료처리
+            if (msg.StartsWith("300"))
+            {
+                // 경고메세지 추후 로그인씬에 뜨게 하기
+                var textList = msg.Split(":");
+                //textList[1] + textList[2]
+
+                SceneManager.LoadScene("LoginScene");
+            }
+
             // 방 목록 처리
             if (msg.StartsWith("/list"))
             {
                 var textList = msg.Split(":");
                 var roomInfo = textList[1].Split("&");
 
-                var roomNameList = roomInfo[0].Split(", ");
-                var userCount = roomInfo[1].Split(", ");
+                if (roomInfo[0] != "")
+                {
+                    var roomNameList = roomInfo[0].Split(", ");
+                    var userCount = roomInfo[1].Split(", ");
 
-                // 맨 마지막 문자열의 공백 제거
-                userCount[userCount.Length - 1] = userCount[userCount.Length - 1].TrimEnd('\0');
+                    // 맨 마지막 문자열의 공백 제거
+                    userCount[userCount.Length - 1] = userCount[userCount.Length - 1].TrimEnd('\0');
+                
+                    SetRoomList(roomNameList, userCount);
 
+                }
 
-                SetRoomList(roomNameList, userCount);
             }
 
             if(msg.StartsWith("Invalid"))
@@ -93,6 +109,37 @@ public class LobbyManager_TCP : MonoBehaviour
         }
 
     }
+
+    public void LogoutBtn()
+    {
+        StartCoroutine(LogoutRequest());
+    }
+
+    // 로그아웃 처리
+    IEnumerator LogoutRequest()
+    {
+        // 요청을 보낼 URL
+        string uri = "https://localhost:7270/account/logout";
+
+        // UnityWebRequest를 사용하여 POST 요청을 보냄
+        UnityWebRequest request = new UnityWebRequest(uri, "POST");
+
+        // 요청을 보내고 응답을 기다림
+        yield return request.SendWebRequest();
+
+        // 에러를 확인하고 처리
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(request.error);
+        }
+        else
+        {            
+            // 로그아웃 성공시 로그인 페이지 이동
+            SceneManager.LoadScene("LoginScene");
+            yield break;
+        }
+    }
+
 
     // 2.5초간 경고창 출력후 사라짐
     IEnumerator SetAlertPanel(string msg)
@@ -128,19 +175,30 @@ public class LobbyManager_TCP : MonoBehaviour
     {
         int cnt = content.transform.childCount;
 
+
+
         // 현재 내 방제목이 서버에서 보내준 방제목과 같을 때 인원수만 갱신. (버튼에 달린 방제목 수정 불필요. )
+        // 만약 내 인원수가 0이라면 삭제. 
         for (int i = 0; i < cnt; i++)
         {
             Transform roomObj = content.transform.GetChild(i);
 
             TMP_Text[] texts = roomObj.GetComponentsInChildren<TMP_Text>();
 
+
             // 텍스트 넣기
             for (int j = 0; j < roomNameList.Length; j++)
             {
                 if (texts[0].text == roomNameList[j])
                 {
-                    texts[1].text = userCountList[j] + "/10";
+                    if(userCountList[j] == "0")
+                    {
+                        Destroy(roomObj.gameObject);
+                    }
+                    else
+                    {
+                    texts[1].text = userCountList[j] + "/4";
+                    }
 
                     // 반영한 유저수는 삭제하기 위해 null 대입. 
                     userCountList[j] = null;
@@ -153,7 +211,7 @@ public class LobbyManager_TCP : MonoBehaviour
         // 새로 방 prefab을 추가해 데이터를 적용해준다. 
         for (int i = 0; i < roomNameList.Length; i++)
         {
-            if (userCountList[i] != null)
+            if (userCountList[i] != null && userCountList[i] != "0")
             {
                 // 오브젝트 생성
                 var newtextobj = Instantiate(roomPrefab, Vector3.zero, Quaternion.identity);
@@ -162,7 +220,7 @@ public class LobbyManager_TCP : MonoBehaviour
                 // 텍스트 넣기
                 TMP_Text[] texts = newtextobj.GetComponentsInChildren<TMP_Text>();
                 texts[0].text = roomName;
-                texts[1].text = userCountList[i] + "/10";
+                texts[1].text = userCountList[i] + "/4";
 
                 // 버튼 리스너 달아줌
                 Button enterBtn = newtextobj.GetComponentInChildren<Button>();
@@ -203,7 +261,7 @@ public class LobbyManager_TCP : MonoBehaviour
         string sessionId = gameManager.SessionId;
         string username = gameManager.Username;
 
-        // 나중에 본인 ID 받아와서 출력하게 바꾸기
+        // sessionId와 username 전송
         string sessionInfoMessage = $"/session,{sessionId},{username}";
         var data = Encoding.UTF8.GetBytes(sessionInfoMessage);
         tcpClient.GetStream().Write(data);

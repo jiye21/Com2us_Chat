@@ -331,6 +331,7 @@ MonoBehaviour:
   Password: {fileID: 1990096242}
   username: 
   password: 
+  alertPanel: {fileID: 1569028974666363395}
 --- !u!1001 &1238490042
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -396,10 +397,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 404743689910503911, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -6.9
-      objectReference: {fileID: 0}
     - target: {fileID: 2065597990199337427, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
       propertyPath: m_Camera
       value: 
@@ -408,18 +405,18 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1101640841}
-    - target: {fileID: 2175717635130494635, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LoginBtn
+    - target: {fileID: 2849179714292041947, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1101640841}
+    - target: {fileID: 5218168285375666554, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.size
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4216104019446533066, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 200.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 4394308029439596595, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -6.9000244
-      objectReference: {fileID: 0}
+    - target: {fileID: 5218168285375666554, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1101640841}
     - target: {fileID: 5843602094999152117, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -504,25 +501,9 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1101640841}
-    - target: {fileID: 6733117453164537673, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SignUpBtn
-      objectReference: {fileID: 0}
-    - target: {fileID: 6940960811007872532, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -347.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7312410142062346678, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -530
-      objectReference: {fileID: 0}
     - target: {fileID: 7615471496479727572, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
       propertyPath: m_Name
       value: LoginCanvas
-      objectReference: {fileID: 0}
-    - target: {fileID: 7842273218452054768, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 200.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -537,6 +518,11 @@ GameObject:
 --- !u!1 &1990096243 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1653403674518908298, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
+  m_PrefabInstance: {fileID: 1990096241}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1569028974666363395 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 193108668246034509, guid: e38d5b66b4c54aa4cb2c5c3f1a5388ae, type: 3}
   m_PrefabInstance: {fileID: 1990096241}
   m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807

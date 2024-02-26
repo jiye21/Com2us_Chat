@@ -15,12 +15,14 @@ public class LoginManager_HTTP : MonoBehaviour
         public string username;
     }
 
-
     public GameObject UserName;
     public GameObject Password;
 
     public string username;
     public string password;
+
+    public GameObject alertPanel;
+
 
     void Start()
     {
@@ -31,6 +33,11 @@ public class LoginManager_HTTP : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void ExitBtn()
+    {
+        Application.Quit();
     }
 
     public void LoginBtn()
@@ -80,29 +87,38 @@ public class LoginManager_HTTP : MonoBehaviour
         if (request.result != UnityWebRequest.Result.Success)
         {
             Debug.Log(request.error);
+
+            // 에러 메세지 출력
+            StartCoroutine(SetAlertPanel(request.error));
         }
         else
         {
             // 서버 응답을 받아서 처리
             // downloadHandler는 UnityWebRequest의 속성 중 하나로, HTTP 응답 데이터를 처리한다.
-            // .text는 HTTP 응답의 본문을 텍스트 형식으로 가져온다. 
-            //Debug.Log("서버 응답: " + request.downloadHandler.text);
 
             // 서버 응답을 ServerResponse 객체로 파싱
             ServerResponse serverResponse = JsonUtility.FromJson<ServerResponse>(request.downloadHandler.text);
 
-            // GameManager에 결과, 세션 키 및 username 저장
-            GameManager gameManager = FindObjectOfType<GameManager>();
-
-            if (gameManager != null)
+            if(serverResponse.result != "성공")
             {
-                gameManager.SaveSessionInfo(serverResponse.result, serverResponse.sessionId, serverResponse.username);
+                StartCoroutine(SetAlertPanel(serverResponse.result));
+
+                yield break;
             }
+            else
+            {
+                // GameManager에 결과, 세션 키 및 username 저장
+                GameManager gameManager = FindObjectOfType<GameManager>();
 
-            // 로그인 성공시 로비로 이동, 추후 세션 체크 조건식 필요
-            SceneManager.LoadScene("LobbyScene");
+                if (gameManager != null)
+                {
+                    gameManager.SaveSessionInfo(serverResponse.result, serverResponse.sessionId, serverResponse.username);
+                }
+                // 로그인 성공시 로비로 이동, 추후 세션 체크 조건식 필요
+                SceneManager.LoadScene("LobbyScene");
 
-            yield break;
+                yield break;
+            }
         }
     }
 
@@ -112,7 +128,6 @@ public class LoginManager_HTTP : MonoBehaviour
         string uri = "https://localhost:7270/account/register";
 
 
-        //string loginData = "{\"loginId\":\"junmo\", \"Password\":\"1234\"}";
         string signupData = $"{{\"userID\":\"{username}\", \"userPW\":\"{password}\"}}";
 
 
@@ -136,20 +151,41 @@ public class LoginManager_HTTP : MonoBehaviour
         if (request.result != UnityWebRequest.Result.Success)
         {
             Debug.Log(request.error);
+
+            // 에러 메세지 출력
+            StartCoroutine(SetAlertPanel(request.error));
         }
         else
         {
             // 서버 응답을 받아서 처리
             // downloadHandler는 UnityWebRequest의 속성 중 하나로, HTTP 응답 데이터를 처리한다.
-            // .text는 HTTP 응답의 본문을 텍스트 형식으로 가져온다. 
-            Debug.Log("서버 응답: " + request.downloadHandler.text);
 
-            // 추후 회원가입 성공 또는 실패시 응답할 메세지 조건식 필요. 
             // 회원가입 후 InputField를 비워준다. 
             UserName.GetComponent<TMP_InputField>().text = "";
             Password.GetComponent<TMP_InputField>().text = "";
 
+
+            // 서버 응답을 ServerResponse 객체로 파싱
+            ServerResponse serverResponse = JsonUtility.FromJson<ServerResponse>(request.downloadHandler.text);
+
+            // 회원가입 결과 패널 표시
+            StartCoroutine(SetAlertPanel(serverResponse.result));
+            
             yield break;
         }
     }
+
+    // 2.5초간 경고창 출력후 사라짐
+    IEnumerator SetAlertPanel(string msg)
+    {
+        alertPanel.SetActive(true);
+        alertPanel.GetComponentInChildren<TMP_Text>().text = msg.TrimEnd('\0');
+
+        yield return new WaitForSecondsRealtime(2.5f);
+
+        alertPanel.SetActive(false);
+
+        yield break;
+    }
+
 }

@@ -5,3 +5,93 @@ C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\obj\Debug\Cha
 C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server_Room.csproj.CoreCompileInputs.cache
 C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server.exe
 C:\Users\cindy\OneDrive\바탕 화면\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server.pdb
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\Chat_Server.exe.config
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\Chat_Server.exe
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\Chat_Server.pdb
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\Pipelines.Sockets.Unofficial.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\StackExchange.Redis.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Buffers.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.IO.Pipelines.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Memory.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Numerics.Vectors.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Threading.Channels.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\Pipelines.Sockets.Unofficial.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\StackExchange.Redis.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Buffers.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.IO.Pipelines.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Memory.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Threading.Channels.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\obj\Debug\Chat_Server_Room.csproj.AssemblyReference.cache
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\obj\Debug\Chat_Server_Room.csproj.CoreCompileInputs.cache
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\obj\Debug\Chat_Server_Room.csproj.CopyComplete
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\obj\Debug\Chat_Server.exe
+C:\Users\SBA\Desktop\0226\Chat_Server_Room (1)\obj\Debug\Chat_Server.pdb
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\Chat_Server.exe.config
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\Chat_Server.exe
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\Chat_Server.pdb
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\Pipelines.Sockets.Unofficial.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\StackExchange.Redis.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Buffers.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.IO.Pipelines.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Memory.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Numerics.Vectors.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Threading.Channels.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\Pipelines.Sockets.Unofficial.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\StackExchange.Redis.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Buffers.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.IO.Pipelines.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Memory.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Threading.Channels.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\obj\Debug\Chat_Server_Room.csproj.AssemblyReference.cache
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\obj\Debug\Chat_Server_Room.csproj.CoreCompileInputs.cache
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\obj\Debug\Chat_Ser.A546E38F.Up2Date
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\obj\Debug\Chat_Server.exe
+C:\Users\SBA\Downloads\Chat_Server_Room (1)\Chat_Server_Room (1)\obj\Debug\Chat_Server.pdb
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Chat_Server.exe.config
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Chat_Server.exe
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Chat_Server.pdb
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Pipelines.Sockets.Unofficial.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\StackExchange.Redis.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Buffers.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.IO.Pipelines.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Memory.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Numerics.Vectors.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Threading.Channels.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Pipelines.Sockets.Unofficial.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\StackExchange.Redis.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Buffers.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.IO.Pipelines.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Memory.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Threading.Channels.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server_Room.csproj.AssemblyReference.cache
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server_Room.csproj.CoreCompileInputs.cache
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Ser.A546E38F.Up2Date
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server.exe
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server.pdb
