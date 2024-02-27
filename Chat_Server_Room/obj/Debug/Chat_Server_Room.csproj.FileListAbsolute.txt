@@ -95,3 +95,5 @@ C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server_Room.csp
 C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Ser.A546E38F.Up2Date
 C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server.exe
 C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\obj\Debug\Chat_Server.pdb
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Newtonsoft.Json.dll
+C:\Users\SBA\Desktop\Com2us_Chat\Chat_Server_Room\bin\Debug\Newtonsoft.Json.xml
