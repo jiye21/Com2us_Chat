@@ -190,15 +190,15 @@ public class LobbyManager_TCP : MonoBehaviour
         int cnt = content.transform.childCount;
 
         // 현재 내 방제목이 서버에서 보내준 방제목과 같을 때 인원수만 갱신. (버튼에 달린 방제목 수정 불필요. )
+        // 현재 떠있는 방 목록만 검사중
         for (int i = 0; i < cnt; i++)
         {
-            // 현재 떠있는 방 목록만 검사중
+            // 서버와 클라의 방 목록을 대조하기 위한 변수
+            bool isRoomExists = false;
+
             Transform roomObj = content.transform.GetChild(i);
 
             TMP_Text[] texts = roomObj.GetComponentsInChildren<TMP_Text>();
-
-            // 서버와 클라의 방 목록을 대조하기 위한 변수
-            bool isRoomExists = false;
 
             for (int j = 0; j < roomNameList.Length; j++)
             {
@@ -209,10 +209,11 @@ public class LobbyManager_TCP : MonoBehaviour
                     // 방이 서버 방 목록에 있고 클라 방 목록에도 있으므로 true로 체크
                     isRoomExists = true;
                     // 반영한 방은 삭제하기 위해 null 대입. 
-                    roomNameList[j] = null;
+                    userCountList[j] = null;
                 }
                 
             }
+
             // 원래 있었던 방이 삭제되었을 때
             if(!isRoomExists)
             {
@@ -225,7 +226,7 @@ public class LobbyManager_TCP : MonoBehaviour
         // 새로운 방이 생겼다면(=데이터가 반영이 안되었다면) 방 prefab을 새로 만들어준다. 
         for (int i = 0; i < roomNameList.Length; i++)
         {
-            if (roomNameList[i] != null && userCountList[i] != "0")
+            if (userCountList[i] != null)
             {
                 // 오브젝트 생성
                 var newtextobj = Instantiate(roomPrefab, Vector3.zero, Quaternion.identity);

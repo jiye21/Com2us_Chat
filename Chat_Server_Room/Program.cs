@@ -16,11 +16,20 @@ using Newtonsoft.Json.Linq;
 public class User
 {
     public bool sessionExists;
-    public User()
+    public ChatRoom currentRoom;
+    public string userName;
+
+    public User(string userName)
     {
         sessionExists = false;
+        this.userName = userName;
+    }
+    public void SetCurrentRoom(ChatRoom room)
+    {
+        currentRoom = room;
     }
 }
+
 public class ChatRoom
 {
     public string Name { get; }
@@ -38,10 +47,6 @@ public class ChatRoom
             NetworkStream stream = new NetworkStream(client);
             stream.Write(buffer, 0, buffer.Length);
             stream.Flush();
-            // 자기 자신에게는 되보내지 않음
-            if (client != sender)
-            {
-            }
         }
     }
     public void AddClient(Socket client)
@@ -67,10 +72,9 @@ public class ChatServer
     public static Dictionary<string, ChatRoom> rooms = new Dictionary<string, ChatRoom>();
     private ConnectionMultiplexer redis;
     private IDatabase db;
-    // 현재 내가 접속한 방 정보
-    public ChatRoom currentRoom;
-    // 세션 체크를 위한 User 클래스의 객체 생성
-    public User user = new User();
+
+
+
     public void Start()
     {
         TcpListener serverSocket = new TcpListener(IPAddress.Any, 9999);
@@ -81,13 +85,6 @@ public class ChatServer
         redis = ConnectionMultiplexer.Connect("127.0.0.1:6379");
         db = redis.GetDatabase();
 
-        // 테스트용 dummy rooms
-        ChatRoom room01 = new ChatRoom("room01");
-        ChatRoom room02 = new ChatRoom("22222");
-        ChatRoom room03 = new ChatRoom("hello_world");
-        rooms.Add(room01.Name, room01);
-        rooms.Add(room02.Name, room02);
-        rooms.Add(room03.Name, room03);
 
 
         while (true)
@@ -104,6 +101,8 @@ public class ChatServer
         byte[] buffer = new byte[2048];
         int bytesRead;
 
+
+
         // Get client's name
         // 클라이언트는 최초 접속시 자신의 이름을 보내준다.
         bytesRead = networkStream.Read(buffer, 0, buffer.Length);
@@ -111,6 +110,12 @@ public class ChatServer
 
         // 세션 정보를 콤마(,)로 분리
         string[] sessionInfoParts = initData.Split(',');
+        // 클라 이름 저장
+        string userName = sessionInfoParts[2].TrimEnd('\0');
+
+        // 세션 체크와 현재 내가 접속한 방 정보 저장을 위한 User 클래스의 객체 생성
+        User user = new User(userName);
+
         if (sessionInfoParts.Length == 3 && sessionInfoParts[0].Trim() == "/session")
         {
             string sessionId = sessionInfoParts[1].Trim();
@@ -127,8 +132,7 @@ public class ChatServer
             }
         }
 
-        // 클라 이름 저장
-        string clientName = sessionInfoParts[2].TrimEnd('\0');
+
 
 
         try
@@ -136,7 +140,7 @@ public class ChatServer
             while ((bytesRead = networkStream.Read(buffer, 0, buffer.Length)) > 0 && user.sessionExists)
             {
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Console.WriteLine("Received from client " + clientName + ": " + message);
+                Console.WriteLine("Received from client " + user.userName + ": " + message);
                 if (message.StartsWith("/join"))
                 {
                     string[] parts = message.Split(' ');
@@ -182,7 +186,7 @@ public class ChatServer
                     if (parts.Length == 2)
                     {
                         string roomName = parts[1].TrimEnd('\0');
-                        JoinRoom(clientSocket, clientName, roomName);
+                        JoinRoom(clientSocket, roomName, user);
                     }
                 }
                 // 채팅 메세지 처리
@@ -212,14 +216,14 @@ public class ChatServer
         finally
         {
             // client와 연결이 종료될 때 유저 목록에서 삭제해준다.
-            if (currentRoom != null)
+            if (user.currentRoom != null)
             {
-                currentRoom.RemoveClient(clientSocket);
+                user.currentRoom.RemoveClient(clientSocket);
 
                 // 만약 모두 나가서 방의 인원수가 0이 되면 해당 방을 방 목록에서 삭제해준다. 
-                if(currentRoom.Clients.Count == 0)
+                if (user.currentRoom.Clients.Count == 0)
                 {
-                    rooms.Remove(currentRoom.Name);
+                    rooms.Remove(user.currentRoom.Name);
                 }
             }
 
@@ -258,15 +262,15 @@ public class ChatServer
         networkStream.Write(buffer, 0, buffer.Length);
         networkStream.Flush();
     }
-    private void JoinRoom(Socket clientSocket, string clientName, string roomName)
+    private void JoinRoom(Socket clientSocket, string roomName, User user)
     {
         // 방의 인원이 4명보다 적으면
         if (rooms[roomName].Clients.Count < 4)
         {
             rooms[roomName].AddClient(clientSocket);
-            currentRoom = rooms[roomName];
+            user.currentRoom = rooms[roomName];
             SendMessage("Joined room: " + roomName, clientSocket);
-            rooms[roomName].BroadcastMessage(clientName + " has joined the room.", clientSocket);
+            //rooms[roomName].BroadcastJoinMessage(user.userName + " has joined the room.", clientSocket);
         }
         else
         {
