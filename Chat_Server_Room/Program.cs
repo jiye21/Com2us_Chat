@@ -1,285 +1,208 @@
-﻿using System;
+﻿using StackExchange.Redis;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
-using StackExchange.Redis;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-// 사용자의 세션 상태 관리 클래스
-public class User : TcpClient
+
+
+
+public class User
 {
-    public bool isSession; // 세션 상태
-    public TcpClient tcpClient;
+    public bool sessionExists;
+    public ChatRoom currentRoom;
+    public string userName;
 
-    public User()
+    public User(string userName)
     {
-        this.isSession = false;
+        sessionExists = false;
+        this.userName = userName;
     }
-
-    // 사용자의 세션 키 검증 메서드
-    public void CheckSessionInRedis(string redisSessionKey, string clientSessionKey)
+    public void SetCurrentRoom(ChatRoom room)
     {
-        if (redisSessionKey == clientSessionKey)
-        {
-            isSession = true;
-        }
-        else
-        {
-            isSession = false;
-        }
+        currentRoom = room;
     }
 }
 
 public class ChatRoom
 {
     public string Name { get; }
-    public List<TcpClient> clients = new List<TcpClient>();
-
+    public List<Socket> Clients = new List<Socket>();
+    public int UserCount => Clients.Count; // 새로운 멤버 변수로 유저 수 제공
     public ChatRoom(string name)
     {
         Name = name;
     }
-
-    public void BroadcastMessage(string message, TcpClient sender)
+    public void BroadcastMessage(string message, Socket sender)
     {
         byte[] buffer = Encoding.UTF8.GetBytes(message);
-        foreach (TcpClient client in clients)
+        foreach (Socket client in Clients)
         {
-            NetworkStream stream = client.GetStream();
+            NetworkStream stream = new NetworkStream(client);
             stream.Write(buffer, 0, buffer.Length);
             stream.Flush();
-
-            // 자기 자신에게는 되보내지 않음
-            if (client != sender)
-            {
-            }
         }
     }
-
-    public void AddClient(TcpClient client)
+    public void AddClient(Socket client)
     {
-        // 이미 client가 list에 담겨 있는 상태라면 바로 함수를 종료한다. 
-        foreach(TcpClient c in clients)
+        // 이미 client가 list에 담겨 있는 상태라면 바로 함수를 종료한다.
+        foreach (Socket c in Clients)
         {
             if (c == client) return;
         }
-
-        clients.Add(client);
+        Clients.Add(client);
+        Console.WriteLine("AddClient호출 " + client);
+        Console.WriteLine("User count in room '" + Name + "': " + UserCount); // 유저 수 출력
     }
-
-    public void RemoveClient(TcpClient client)
+    public void RemoveClient(Socket client)
     {
-        clients.Remove(client);
+        Clients.Remove(client);
+        Console.WriteLine("RemoveClien호출 " + client);
+        Console.WriteLine("RemoveClien호출 " + Clients.Count);
     }
 }
-
 public class ChatServer
 {
-    private TcpListener listener;
-    //public static List<ChatRoom> rooms = new List<ChatRoom>();
     public static Dictionary<string, ChatRoom> rooms = new Dictionary<string, ChatRoom>();
+    private ConnectionMultiplexer redis;
+    private IDatabase db;
 
-    private ConnectionMultiplexer redis; // redis : 레디스 서버와의 연결을 관리
-    private IDatabase db; // db : ConnectionMultiplexer를 통해 얻은 데이터베이스
 
-    public ChatServer(int port)
-    {
-        listener = new TcpListener(IPAddress.Any, port);
-
-        // Redis 서버에 연결하는 정보 설정
-        ConfigurationOptions options = new ConfigurationOptions
-        {
-            EndPoints = { "127.0.0.1:6379" }, // Redis 서버의 주소 및 포트
-            //Password = "1", // Redis에 암호가 설정되어 있는 경우 암호 설정
-            // 다른 설정도 추가할 수 있음
-        };
-
-        // ConnectionMultiplexer를 통해 Redis에 연결
-        ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(options);
-
-        // 연결된 Redis 인스턴스로부터 IDatabase 인터페이스 얻기
-        db = connection.GetDatabase();
-
-    }
 
     public void Start()
     {
-        listener.Start();
+        TcpListener serverSocket = new TcpListener(IPAddress.Any, 9999);
+        serverSocket.Start();
         Console.WriteLine("Chat server started...");
 
-
-        // 테스트용 dummy rooms
-        ChatRoom room01 = new ChatRoom("room01");
-        ChatRoom room02 = new ChatRoom("22222");
-        ChatRoom room03 = new ChatRoom("hello world");
-
-        TcpClient dummy01 = new TcpClient();
-        TcpClient dummy02 = new TcpClient();
-        TcpClient dummy03 = new TcpClient();
-        TcpClient dummy04 = new TcpClient();
-        TcpClient dummy05 = new TcpClient();
-        TcpClient dummy06 = new TcpClient();
-
-        room01.AddClient(dummy01);
-        room01.AddClient(dummy02);
-        room02.AddClient(dummy03);
-        room03.AddClient(dummy04);
-        room03.AddClient(dummy05);
-        room03.AddClient(dummy06);
-
-        rooms.Add("room01", room01);
-        rooms.Add("room02", room02);
-        rooms.Add("room03", room03);
+        // Connect to Redis
+        redis = ConnectionMultiplexer.Connect("127.0.0.1:6379");
+        db = redis.GetDatabase();
 
 
 
         while (true)
         {
-            TcpClient client = listener.AcceptTcpClient();
-            Console.WriteLine("Client connected: " + client.Client.RemoteEndPoint);
-
-            Thread clientThread = new Thread(HandleClient);
-            clientThread.Start(client);
+            Socket clientSocket = serverSocket.AcceptSocket();
+            Console.WriteLine("Client connected: " + clientSocket.RemoteEndPoint);
+            Thread clientThread = new Thread(() => HandleClient(clientSocket));
+            clientThread.Start();
         }
     }
-
-    private void HandleClient(object obj)
+    private void HandleClient(Socket clientSocket)
     {
-        //TcpClient client = (TcpClient)obj;
-        User client = new User();
-        client.tcpClient = (TcpClient)obj;
-        NetworkStream stream = client.tcpClient.GetStream();
-
+        NetworkStream networkStream = new NetworkStream(clientSocket);
         byte[] buffer = new byte[2048];
         int bytesRead;
 
-        ChatRoom room = null;
 
-        // 데이터를 최초 한번 읽음
-        bytesRead = stream.Read(buffer, 0, buffer.Length);
 
-        // 클라가 보낸 세션키 저장, 클라가 연결되자마자 보내는 데이터가 세션키라고 가정함. 
+        // Get client's name
+        // 클라이언트는 최초 접속시 자신의 이름을 보내준다.
+        bytesRead = networkStream.Read(buffer, 0, buffer.Length);
+        string initData = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
-        //string clientSessionKey = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-        string clientSessionKey = "568fa0dc-1e39-45eb-bcf7-73d3d3fd98da";
+        // 세션 정보를 콤마(,)로 분리
+        string[] sessionInfoParts = initData.Split(',');
+        // 클라 이름 저장
+        string userName = sessionInfoParts[2].TrimEnd('\0');
 
-        Console.WriteLine("세션키 잘 받았다~" + clientSessionKey);
+        // 세션 체크와 현재 내가 접속한 방 정보 저장을 위한 User 클래스의 객체 생성
+        User user = new User(userName);
 
-        // 세션 키를 레디스에서 가져오기
-        string redisSessionKey = GetSessionKeyFromRedis();
-
-        // 클라이언트의 세션 확인
-        client.CheckSessionInRedis(redisSessionKey, clientSessionKey);
-
-        if (client.isSession)
+        if (sessionInfoParts.Length == 3 && sessionInfoParts[0].Trim() == "/session")
         {
-            var responseData = Encoding.UTF8.GetBytes("200 : " + "ok");
-            stream.Write(responseData, 0, responseData.Length);
-            stream.Flush();
+            string sessionId = sessionInfoParts[1].Trim();
 
-            Console.WriteLine("Received session key from client: " + clientSessionKey);
+            // 세션 정보 유효성 체크 : Redis에서 세션 조회.
+            // 이곳에서 sessionExists를 true로 바꿔주지 않으면 아래의 while문이 실행되지 않는다.
+            CheckSessionInRedis(sessionId, user);
+            if (!user.sessionExists) // sessionId
+            {
+                // 세션이 Redis에 없으면 연결 종료
+                Console.WriteLine("Invalid session: " + sessionId); // sessionId
+                string msg = "300:";
+                SendMessage(msg, clientSocket);
+            }
         }
-        else
-        {
-            Console.WriteLine("세션키가 달라~");
-            client.Close();
-            return;
-        }
+
+
+
 
         try
         {
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+            while ((bytesRead = networkStream.Read(buffer, 0, buffer.Length)) > 0 && user.sessionExists)
             {
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-                Console.WriteLine("Received from client: " + message);
-
-                // Check if message is a command to join a room
-                // ex) "/join 10"
+                Console.WriteLine("Received from client " + user.userName + ": " + message);
                 if (message.StartsWith("/join"))
                 {
                     string[] parts = message.Split(' ');
                     if (parts.Length == 2)
                     {
-                        string roomName = parts[1];
-                        // roomName으로 방 생성 후 방 list에 저장
-                        room = GetOrCreateRoom(roomName);
-
-                        Console.WriteLine("Client joined room: " + roomName);
-
-                        // 응답코드와 방번호 전송, 200 = ok.
-                        var responseData = Encoding.UTF8.GetBytes("200 : " + roomName);
-                        stream.Write(responseData, 0, responseData.Length);
-                        stream.Flush();
+                        string roomName = parts[1].TrimEnd('\0');
+                        if (rooms.ContainsKey(roomName))
+                        {
+                            // 방 접속 승인, 진짜 방 입장은 ChatScene에서 이루어짐
+                            string msg = "200:" + roomName;
+                            SendMessage(msg, clientSocket);
+                        }
+                    }
+                    else
+                    // 클라이언트에 예외메세지 출력 구현 필요
+                    {
+                        SendMessage("Invalid /join command. Usage: /join [room_name]", clientSocket);
                     }
                 }
                 else if (message.StartsWith("/create"))
                 {
                     string[] parts = message.Split(' ');
+                    string roomName = parts[1].TrimEnd('\0');
                     if (parts.Length == 2)
                     {
-                        string roomName = parts[1];
-
-                        var responseData = Encoding.UTF8.GetBytes("200 : " + roomName);
-                        stream.Write(responseData, 0, responseData.Length);
-                        stream.Flush();
+                        CreateRoom(clientSocket, roomName);
                     }
                     else
                     {
-                        //SendMessage("Invalid /create command. Usage: /create [room_name]", clientSocket);
+                        SendMessage("Invalid Roomname. No spaces allowed. ", clientSocket);
                     }
                 }
                 else if (message.StartsWith("/list"))
                 {
-                    List<string> userCount = new List<string>();
-                    foreach (ChatRoom r in rooms.Values)
-                    {
-                        userCount.Add(r.clients.Count.ToString());
-                    }
-                    string aa = "Available_rooms : " + 
-                        string.Join(", ", rooms.Keys) + 
-                        "and" + string.Join(", ", userCount);
-
-                    Console.WriteLine(aa);
-
-                    SendMessage(aa, client);
-                    //var responseData = Encoding.UTF8.GetBytes(data);
-                    //stream.Write(responseData, 0, responseData.Length);
-                    //stream.Flush();
+                    SendRoomList(clientSocket);
                 }
+                // 로비에서 접속을 끊고 채팅방으로 이동(새로운 접속) 후의 상황.
+                // 클라이언트에서 방 제목도 같이 보내준다. ex. "/newchat [room_name]"
+                // 방 입장 처리를 이곳에서 한다.
+                else if (message.StartsWith("/newchat"))
+                {
+                    string[] parts = message.Split(' ');
+                    if (parts.Length == 2)
+                    {
+                        string roomName = parts[1].TrimEnd('\0');
+                        JoinRoom(clientSocket, roomName, user);
+                    }
+                }
+                // 채팅 메세지 처리
                 else
                 {
-                    // 로비에서 접속을 끊고 채팅방으로 이동(새로운 접속) 후의 상황. 
-                    // 클라이언트에서 몇번 방인지 같이 보내준다. ex. "0)id:msg"
-
                     // parts[0] = 방번호, parts[1] = 메세지 내용
-                    string[] parts = message.Split(')');
+                    string[] parts = message.Split(' ');
                     if (parts.Length == 2)
                     {
                         string roomName = parts[0];
                         string responseData = parts[1];
-
-                        // 최초 접속시에만 실행
-                        if (parts[1] == "new client connected")
-                        {
-                            // roomName으로 방정보 Get
-                            room = GetOrCreateRoom(roomName);
-                            // 방에 client 추가, 만약 이미 client가 방에 추가되어 있으면 추가하지 않고 함수 종료. 
-                            room.AddClient(client);
-
-                            responseData = " " + ":" + responseData;
-                        }
-
-
-                        // Broadcast message to client's room
                         foreach (ChatRoom r in rooms.Values)
                         {
                             if (r.Name == roomName)
                             {
-                                r.BroadcastMessage(responseData, client);
-                                break;
+                                r.BroadcastMessage(responseData, clientSocket);
                             }
                         }
                     }
@@ -292,47 +215,103 @@ public class ChatServer
         }
         finally
         {
-            // client와 연결이 종료될 때 방 목록에서도 삭제해준다. 
-            if(room != null) room.RemoveClient(client);
-            client.Close();
+            // client와 연결이 종료될 때 유저 목록에서 삭제해준다.
+            if (user.currentRoom != null)
+            {
+                user.currentRoom.RemoveClient(clientSocket);
+
+                // 만약 모두 나가서 방의 인원수가 0이 되면 해당 방을 방 목록에서 삭제해준다. 
+                if (user.currentRoom.Clients.Count == 0)
+                {
+                    rooms.Remove(user.currentRoom.Name);
+                }
+            }
+
+            clientSocket.Close();
         }
     }
-
-    // 레디스에서 세션키 가져오기
-    private string GetSessionKeyFromRedis()
+    private void CheckSessionInRedis(string sessionId, User user)
     {
-        string sessionKey = db.StringGet("2d163123-93ad-4ceb-a98e-d022500e3645");
-        return sessionKey;
-    }
-
-    private void SendMessage(string message, TcpClient clientSocket)
-    {
-        byte[] buffer = Encoding.UTF8.GetBytes(message);
-        NetworkStream stream = clientSocket.GetStream();
-        stream.Write(buffer, 0, buffer.Length);
-        stream.Flush();
-    }
-
-    private ChatRoom GetOrCreateRoom(string roomName)
-    {
-        foreach (ChatRoom room in rooms.Values)
+        try
         {
-            if (room.Name == roomName)
+            IDatabase redisDb = redis.GetDatabase();
+            // Redis에서 세션 조회
+            if (!redisDb.KeyExists(sessionId))
             {
-                return room;
+                // 세션이 Redis에 없는 경우 처리
+                Console.WriteLine("Session not found in Redis: " + sessionId);
+                user.sessionExists = false;
+            }
+            else
+            {
+                // Redis에 세션이 존재하는 경우 처리
+                Console.WriteLine("Session found in Redis: " + sessionId);
+                user.sessionExists = true;
             }
         }
-
-        ChatRoom newRoom = new ChatRoom(roomName);
-        // roomlist에 room 추가
-        rooms.Add(roomName, newRoom);
-        return newRoom;
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error checking session in Redis: " + ex.Message);
+        }
     }
+    private void SendMessage(string message, Socket clientSocket)
+    {
+        byte[] buffer = Encoding.UTF8.GetBytes(message + "\0");
+        //byte[] buffer = Encoding.UTF8.GetBytes(message);
+        NetworkStream networkStream = new NetworkStream(clientSocket);
+        networkStream.Write(buffer, 0, buffer.Length);
+        networkStream.Flush();
+    }
+    private void JoinRoom(Socket clientSocket, string roomName, User user)
+    {
+        // 방의 인원이 4명보다 적으면
+        if (rooms[roomName].Clients.Count < 4)
+        {
+            rooms[roomName].AddClient(clientSocket);
+            user.currentRoom = rooms[roomName];
+            SendMessage("Joined room: " + roomName, clientSocket);
+            //rooms[roomName].BroadcastJoinMessage(user.userName + " has joined the room.", clientSocket);
+        }
+        else
+        {
+            // 클라 예외처리 구현 필요
+            SendMessage("Room does not exist: " + roomName, clientSocket);
+        }
+    }
+    private void SendRoomList(Socket clientSocket)
+    {
+        JObject jsonData = new JObject();
 
+        List<string> roomList = new List<string>();
+        List<string> userCountList = new List<string>();
+        foreach (ChatRoom r in rooms.Values)
+        {
+            roomList.Add(r.Name);
+            userCountList.Add(r.Clients.Count.ToString());
+        }
+
+        jsonData.Add(new JProperty("roomName", JArray.FromObject(roomList)));
+        jsonData.Add(new JProperty("userCount", JArray.FromObject(userCountList)));
+
+        SendMessage(JsonConvert.SerializeObject(jsonData), clientSocket);
+    }
+    private void CreateRoom(Socket clientSocket, string roomName)
+    {
+        // 방 생성 후 바로 입장 승인. 실제 방 입장은 ChatScene에서 이루어짐.
+        if (!rooms.ContainsKey(roomName))
+        {
+            rooms.Add(roomName, new ChatRoom(roomName));
+            SendMessage("200:" + roomName, clientSocket);
+        }
+        else
+        {
+            // 클라 예외처리 구현 필요
+            SendMessage("Room already exists: " + roomName, clientSocket);
+        }
+    }
     public static void Main(string[] args)
     {
-        int port = 9999; // Change this to desired port number
-        ChatServer server = new ChatServer(port);
+        ChatServer server = new ChatServer();
         server.Start();
     }
 }
