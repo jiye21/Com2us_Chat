@@ -36,7 +36,9 @@ public class LobbyManager_TCP : MonoBehaviour
     [SerializeField]
     ScrollRect uiView;
 
-    GameObject alertPanel;
+    GameObject alertPanelInCreateCanvas;
+
+    public GameObject alertPanel;
 
     public class ListData
     {
@@ -53,6 +55,8 @@ public class LobbyManager_TCP : MonoBehaviour
 
         // 방 목록 가져오는 코루틴 시작. 3초마다 갱신함. 
         StartCoroutine("GetRoomList");
+
+        alertPanelInCreateCanvas = createRoomCanvas.transform.GetChild(5).gameObject;
     }
 
 
@@ -84,6 +88,20 @@ public class LobbyManager_TCP : MonoBehaviour
 
                 SceneManager.LoadScene("LoginScene");
             }
+            else if (msg.StartsWith("400"))
+            {
+                var textList = msg.Split(":");
+
+                // 경고 메세지 출력
+                StartCoroutine(SetAlertPanel(textList[1]));
+            }
+            else if (msg.StartsWith("401"))
+            {
+                var textList = msg.Split(":");
+
+                // 경고 메세지 출력                
+                StartCoroutine(SetAlertPanelInCreateCanvas(textList[1]));
+            }
             /*
             // 방 목록 처리
             if (msg.StartsWith("/list"))
@@ -108,8 +126,8 @@ public class LobbyManager_TCP : MonoBehaviour
             else if (msg.StartsWith("Invalid"))
             {
                 // 경고 메세지 출력
-                alertPanel = createRoomCanvas.transform.GetChild(5).gameObject;
-                StartCoroutine(SetAlertPanel(msg));
+                
+                StartCoroutine(SetAlertPanelInCreateCanvas(msg));
             }
             else
             {
@@ -154,6 +172,19 @@ public class LobbyManager_TCP : MonoBehaviour
         }
     }
 
+
+    // 2.5초간 경고창 출력후 사라짐 (Create Canvas 안의 AlertPanel)
+    IEnumerator SetAlertPanelInCreateCanvas(string msg)
+    {
+        alertPanelInCreateCanvas.SetActive(true);
+        alertPanelInCreateCanvas.GetComponentInChildren<TMP_Text>().text = msg.TrimEnd('\0');
+
+        yield return new WaitForSecondsRealtime(2.5f);
+
+        alertPanel.SetActive(false);
+
+        yield break;
+    }
 
     // 2.5초간 경고창 출력후 사라짐
     IEnumerator SetAlertPanel(string msg)

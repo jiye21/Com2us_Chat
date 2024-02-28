@@ -149,9 +149,18 @@ public class ChatServer
                         string roomName = parts[1].TrimEnd('\0');
                         if (rooms.ContainsKey(roomName))
                         {
-                            // 방 접속 승인, 진짜 방 입장은 ChatScene에서 이루어짐
-                            string msg = "200:" + roomName;
-                            SendMessage(msg, clientSocket);
+                            // 방의 인원이 4명보다 적으면
+                            if (rooms[roomName].Clients.Count < 4)
+                            {
+                                // 방 접속 승인, 진짜 방 입장은 ChatScene에서 이루어짐
+                                string msg = "200:" + roomName;
+                                SendMessage(msg, clientSocket);
+                            }
+                            else
+                            {
+                                // 클라 예외처리 구현 필요
+                                SendMessage("400: 방이 가득 찼습니다. " + roomName, clientSocket);
+                            }
                         }
                     }
                     else
@@ -264,19 +273,11 @@ public class ChatServer
     }
     private void JoinRoom(Socket clientSocket, string roomName, User user)
     {
-        // 방의 인원이 4명보다 적으면
-        if (rooms[roomName].Clients.Count < 4)
-        {
-            rooms[roomName].AddClient(clientSocket);
-            user.currentRoom = rooms[roomName];
-            SendMessage("Joined room: " + roomName, clientSocket);
-            //rooms[roomName].BroadcastJoinMessage(user.userName + " has joined the room.", clientSocket);
-        }
-        else
-        {
-            // 클라 예외처리 구현 필요
-            SendMessage("Room does not exist: " + roomName, clientSocket);
-        }
+        rooms[roomName].AddClient(clientSocket);
+        user.currentRoom = rooms[roomName];
+        SendMessage("Joined room: " + roomName, clientSocket);
+        //rooms[roomName].BroadcastJoinMessage(user.userName + " has joined the room.", clientSocket);
+        
     }
     private void SendRoomList(Socket clientSocket)
     {
@@ -306,7 +307,7 @@ public class ChatServer
         else
         {
             // 클라 예외처리 구현 필요
-            SendMessage("Room already exists: " + roomName, clientSocket);
+            SendMessage("401: 해당 제목의 방이 이미 존재합니다. " + roomName, clientSocket);
         }
     }
     public static void Main(string[] args)
