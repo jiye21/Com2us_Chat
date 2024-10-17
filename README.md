@@ -22,7 +22,7 @@
 # 2. Team Members (팀원 및 팀 소개)
 
 
-| **박지예** | **문지미** | **전준모** |
+| 박지예 | 문지미 | 전준모 |
 |:--:|:--:|:--:|
 | <img  src="https://github.com/user-attachments/assets/4b410760-99a7-4a25-aabc-3c6bc3f654b4" width="100%"/><br /> <img  src="https://github.com/user-attachments/assets/8c4bc946-b4db-454a-82eb-7999bbd53d26" width="80%"/> | <img  src="https://github.com/user-attachments/assets/4b410760-99a7-4a25-aabc-3c6bc3f654b4" /> <br /> <img  src="https://github.com/user-attachments/assets/f8092671-8b82-4dc9-bba1-af4cefdd1a56" width="80%"/>| <img  src="https://github.com/user-attachments/assets/64edca2d-0c6f-46a7-be4f-b0c1578a387b" width="100%"/> <br /> <img  src="https://github.com/user-attachments/assets/666e53b7-ed30-4c35-b87c-0e4fb5f50342" width="90%"/>|
 | FE, BE (실시간 서버) | BE (실시간 서버) | BE (인증 서버) |
@@ -76,6 +76,84 @@
 | **문지미** | <ul><li>실시간 서버 개발<br />- 실시간 서버와 캐싱 서버의 연결 관리</li><li>로그인 화면 개발</li></ul> |
 | **전준모** | <ul><li>인증 서버 개발<br />- 인증 서버와 AWS EC2 MySQL 연동<br />- 클라이언트에서 입력받은 로그인 정보로 알맞은 응답 생성 후 전달<br />- 세션키 발급 부분 개발</li></ul> |
 
+
+<br/>
+
+<br/>
+
+# 5. Technology Stack (기술 스택)
+
+## 5.1 Language
+
+| C# | <img src="https://github.com/user-attachments/assets/cbf32ce1-adcf-4eed-b136-010129697892" width="100"> |
+|-----------------|-----------------|
+
+
+<br/>
+
+## 5.2 Frotend
+
+| Unity | <img src="https://github.com/user-attachments/assets/617a3fbd-4c97-43c7-b42f-5090358e9cb9" width="100"> | 2022.3.14f1 |
+|-----------------|-----------------|-----------------|
+
+
+<br/>
+
+## 5.3 Backend
+
+| ASP .NET | <img src="https://github.com/user-attachments/assets/753c0887-3114-4f24-85e8-27356dd86e72" width="130"> | 7.0 |
+|-----------------|-----------------|-----------------|
+
+<br/>
+
+
+## 5.4 Cooperation
+
+| | |
+|-----------------|-----------------|
+| Git | <img src="https://github.com/user-attachments/assets/483abc38-ed4d-487c-b43a-3963b33430e6" alt="git" width="100"> |
+| Slack | <img src="https://github.com/user-attachments/assets/c415411f-0295-4943-9d37-53c08705705d" width="100"> |
+| Notion | <img src="https://github.com/user-attachments/assets/34141eb9-deca-416a-a83f-ff9543cc2f9a" alt="Notion" width="100"> |
+
+
+<br/>
+
+# 6. Project Structure (프로젝트 구조)
+
+```plaintext
+├── ChatClient/
+│  ├── Assets/  # 프로젝트에 사용된 에셋 모음
+│  ├── ProjectSettings/  # 프로젝트의 전반적인 설정 파일 폴더
+│  ├── build/  # 빌드 파일이 들어있는 폴더
+│  │   ├── ...
+│  │   ├── Chatting_Client.exe  # 채팅 서비스(클라이언트) 실행 파일
+├── Chat_Server_Room/
+│  ├── Properties/
+│  ├── App.config
+│  ├── Chat_Server_Room.csproj
+│  ├── Program.cs  # 실시간 서버의 메인 코드 파일
+│  ├── packages.config  # nuget 패키지들
+├── Web_API_Server/
+│  ├── Config/Database/Init/account.sql  # DB Init 파일
+│  ├── Controllers/
+│  │   ├── DTO/Account.cs
+│  │   ├── AccountController.cs
+│  ├── Database/
+│  │   ├── Database.cs
+│  ├── Properties/
+│  │   ├── launchSettings.json
+│  ├── obj/Release/net7.0/
+│  │   ├── ...
+│  ├── ErrorCode.cs  # 에러 발생 시 보낼 응답 코드
+│  ├── Program.cs  # 애플리케이션의 시작점. 호스팅 설정, 서비스 구성 등을 함
+│  ├── ...
+│  ├── appsettings.json  # DB 접속 주소 설정 파일
+├── .gitignore
+└── README.md
+
+```
+
+  
 
 <br/>
 
