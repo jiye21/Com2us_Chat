@@ -2,10 +2,6 @@
 
 - [소켓통신 공부 📡](https://github.com/jiye21/Com2us_Chat/wiki/%EC%86%8C%EC%BC%93%ED%86%B5%EC%8B%A0-%EA%B3%B5%EB%B6%80)
 ---
-<center><img  src="https://github.com/user-attachments/assets/c54d6fee-9280-4ebf-87ae-882ec5d0ae05"  alt="배너"  width="25%"/></center>
-
-
-<br/>
 
 
 # 1. Project Overview (프로젝트 개요)
