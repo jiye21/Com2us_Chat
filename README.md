@@ -1,9 +1,3 @@
-## 개인 학습
-
-- [소켓통신 공부 📡](https://github.com/jiye21/Com2us_Chat/wiki/%EC%86%8C%EC%BC%93%ED%86%B5%EC%8B%A0-%EA%B3%B5%EB%B6%80)
----
-
-
 # 1. Project Overview (프로젝트 개요)
 
 - 프로젝트 이름: 나는 시민입니다.
@@ -111,12 +105,11 @@
 
 ## 5.4 Cooperation
 
-| | |
-|-----------------|-----------------|
-| Git | <img src="https://github.com/user-attachments/assets/483abc38-ed4d-487c-b43a-3963b33430e6" alt="git" width="100"> |
-| Slack | <img src="https://github.com/user-attachments/assets/c415411f-0295-4943-9d37-53c08705705d" width="100"> |
+| Tool   | Icon |
+|--------|------|
+| Git    | <img src="https://github.com/user-attachments/assets/483abc38-ed4d-487c-b43a-3963b33430e6" alt="git" width="100"> |
+| Slack  | <img src="https://github.com/user-attachments/assets/c415411f-0295-4943-9d37-53c08705705d" width="100"> |
 | Notion | <img src="https://github.com/user-attachments/assets/34141eb9-deca-416a-a83f-ff9543cc2f9a" alt="Notion" width="100"> |
-
 
 <br/>
 
